@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericSqlBuilder", "GenericSqlBuilder\GenericSqlBuilder.csproj", "{F75B1C30-AA74-46C7-B70D-22724E5D2A3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericSqlBuilder.Tests", "GenericSqlBuilder.Tests\GenericSqlBuilder.Tests.csproj", "{8F001136-B57B-4F83-8C04-A63091864A0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{F75B1C30-AA74-46C7-B70D-22724E5D2A3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F75B1C30-AA74-46C7-B70D-22724E5D2A3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F75B1C30-AA74-46C7-B70D-22724E5D2A3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F001136-B57B-4F83-8C04-A63091864A0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F001136-B57B-4F83-8C04-A63091864A0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F001136-B57B-4F83-8C04-A63091864A0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F001136-B57B-4F83-8C04-A63091864A0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
