@@ -7,29 +7,6 @@ using PeanutButter.Utils;
 
 namespace GenericSqlBuilder
 {
-    public class Test
-    {
-        public int Name { get; set; }
-        void Foo()
-        {
-            var statement = new SqlBuilder()
-                .Select<Test>(o =>
-                {
-                    o.UsePropertyCase(Casing.PascalCase);
-                    o.IgnoreProperty(nameof(FooMoo.Age));
-                })
-                .From("shipments")
-                .Where("id")
-                .Equals("@Id")
-                .And("name")
-                .Like("@Name");
-        }
-    }
-
-    public class FooMoo
-    {
-        public int Age { get; set; }
-    }
     public class SqlBuilder
     {
         private string _sql;
@@ -61,13 +38,14 @@ namespace GenericSqlBuilder
         {
             var selectStatementOptions = new SqlStatementOptions();
             options(selectStatementOptions);
-            var ignoredProperties = selectStatementOptions.FetchIgnoredProperties();
-            _sql = CreateSelectStatement<T>(ignoredProperties);
+            _sqlStatementOptions = selectStatementOptions;
+            _sql = CreateSelectStatement<T>();
             return Select(_sql);
         }
 
-        private string CreateSelectStatement<T>(List<string> remove = null)
+        private string CreateSelectStatement<T>()
         {
+            var remove = _sqlStatementOptions.GetIgnoredProperties();
             var dataTable = GenericPropertyBuilder<T>.GetGenericProperties();
             
             if (remove != null && remove.Count > 0)
@@ -81,7 +59,7 @@ namespace GenericSqlBuilder
             var variableArray = new string[dataTable.Columns.Count];
             for (var i = 0; i < dataTable.Columns.Count; i ++)
             {
-                variableArray[i] = _sqlStatementOptions.Casing switch
+                variableArray[i] = _sqlStatementOptions.GetCase() switch
                 {
                     Casing.UpperCase => dataTable.Columns[i].ColumnName.ToUpperInvariant(),
                     Casing.LowerCase => dataTable.Columns[i].ColumnName.ToLowerInvariant(),
@@ -101,18 +79,23 @@ namespace GenericSqlBuilder
         public SqlStatementOptions()
         {
             _propertiesToIgnore = new List<string>();
-            Casing = Casing.LowerCase;
+            _casing = Casing.LowerCase;
         }
         
-        public Casing Casing;
+        private Casing _casing;
         private readonly List<string> _propertiesToIgnore;
 
         public void UsePropertyCase(Casing casing)
         {
-            Casing = casing;
+            _casing = casing;
         }
 
-        public List<string> FetchIgnoredProperties()
+        public Casing GetCase()
+        {
+            return _casing;
+        }
+
+        public List<string> GetIgnoredProperties()
         {
             return _propertiesToIgnore;
         }
@@ -234,19 +217,19 @@ namespace GenericSqlBuilder
 
         public JoinStatement LeftJoin(string table)
         {
-            AddStatement($"LEFT JOIN {table}");
+            AddStatement($"LEFT JOIN {table} ");
             return new JoinStatement(_statements);
         }
 
         public JoinStatement RightJoin(string table)
         {
-            AddStatement($"RIGHT JOIN {table}");
+            AddStatement($"RIGHT JOIN {table} ");
             return new JoinStatement(_statements);
         }
 
         public JoinStatement InnerJoin(string table)
         {
-            AddStatement($"INNER JOIN {table}");
+            AddStatement($"INNER JOIN {table} ");
             return new JoinStatement(_statements);
         }
     }

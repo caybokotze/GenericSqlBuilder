@@ -86,9 +86,46 @@ namespace GenericSqlBuilder.Tests
                         // arrange
                         // act
                         var sql = new SqlBuilder()
-                            .Select<Person>(o => o.IgnoreProperty(nameof(Person.Name)));
+                            .Select<Person>(o => o.IgnoreProperty(nameof(Person.Name)))
+                            .Build(For.MySql);
                         // assert
-                        Expect(sql).To.Equal("")
+                        Expect(sql).To.Equal("SELECT id, surname, email;");
+                    }
+                    
+                    [Test]
+                    public void ShouldBuildSelectWithMultipleRemovedProperties()
+                    {
+                        // arrange
+                        // act
+                        var sql = new SqlBuilder()
+                            .Select<Person>(o =>
+                            {
+                                o.IgnoreProperty(nameof(Person.Name));
+                                o.IgnoreProperty(nameof(Person.Surname));
+                            })
+                            .Build(For.MySql);
+                        // assert
+                        Expect(sql).To.Equal("SELECT id, email;");
+                    }
+                    
+                    [Test]
+                    public void ShouldBuildSelectWithMultipleRemovedPropertiesAndJoinStatement()
+                    {
+                        // arrange
+                        // act
+                        var sql = new SqlBuilder()
+                            .Select<Person>(o =>
+                            {
+                                o.IgnoreProperty(nameof(Person.Name));
+                                o.IgnoreProperty(nameof(Person.Surname));
+                            })
+                            .From("people")
+                            .LeftJoin("customers").On("people.id").Equals("customers.id")
+                            .Where("id")
+                            .Equals("@Id")
+                            .Build(For.MySql);
+                        // assert
+                        Expect(sql).To.Equal("SELECT id, email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;");
                     }
                 }
                 
@@ -112,7 +149,32 @@ namespace GenericSqlBuilder.Tests
                 [TestFixture]
                 public class CasingTests
                 {
+                    [Test]
+                    public void ShouldConvertPropertiesToLowerCaseByDefault()
+                    {
+                        // arrange
+                        // act
+                        var sql = new SqlBuilder()
+                            .Select<Person>()
+                            .Build(For.MySql);
+                        // assert
+                        Expect(sql).To.Equal("SELECT id, name, surname, email;");
+                    }
                     
+                    [Test]
+                    public void ShouldConvertPropertiesToUppercase()
+                    {
+                        // arrange
+                        // act
+                        var sql = new SqlBuilder()
+                            .Select<Person>(o =>
+                            {
+                                o.UsePropertyCase(Casing.UpperCase);
+                            })
+                            .Build(For.MySql);
+                        // assert
+                        Expect(sql).To.Equal("SELECT ID, NAME, SURNAME, EMAIL;");
+                    }
                 }
             }
         }
