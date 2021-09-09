@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace GenericSqlBuilder
@@ -12,15 +15,17 @@ namespace GenericSqlBuilder
         void Foo()
         {
             new SqlBuilder()
-                .Select<Test>(s =>
+                .Select<Test>(o =>
                 {
-                    s.IgnoreProperty(nameof(FooMoo.Age));
+                    o.UsePropertyCase(Casing.PascalCase);
+                    o.IgnoreProperty(nameof(FooMoo.Age));
                 })
                 .From("shipments")
                 .Where("id")
                 .Equals("@Id")
                 .And("name")
-                .Like("@Name");
+                .Like("@Name")
+                .Build(For.MySql);
         }
     }
 
@@ -30,6 +35,13 @@ namespace GenericSqlBuilder
     }
     public class SqlBuilder
     {
+        private string _sql;
+
+        public SqlBuilder()
+        {
+            _sql = new string("");
+        }
+
         public SelectStatement Select(string properties)
         {
             return new SelectStatement(properties);
@@ -37,35 +49,63 @@ namespace GenericSqlBuilder
         
         public SelectStatement Select<T>()
         {
-            return new SelectStatement();
+            _sql = CreateSelectStatement<T>();
+            return Select(_sql);
         }
 
-        public SelectStatement Select<T>(Action<SqlStatementOptions<T>> options) where T : new()
+        public SelectStatement Select<T>(Action<SqlStatementOptions> options) where T : new()
         {
-            var selectStatementOptions = new SqlStatementOptions<T>();
+            var selectStatementOptions = new SqlStatementOptions();
             options(selectStatementOptions);
-            return new SelectStatement();
+            var ignoredProperties = selectStatementOptions.FetchIgnoredProperties();
+            _sql = CreateSelectStatement<T>(ignoredProperties);
+            return Select(_sql);
+        }
+
+        private string CreateSelectStatement<T>(List<string> remove = null)
+        {
+            var dataTable = GenericPropertyBuilder<T>.GetGenericProperties();
+            if (remove != null && remove.Count > 0)
+            {
+                foreach (var item in remove)
+                {
+                    dataTable.Columns.Remove(item);
+                }
+            }
+
+            var variables = dataTable.Columns
+                .Cast<object>()
+                .Aggregate("", (current, _) => string.Join(", ", current));
+
+            variables = variables.Remove(variables.Length, -2);
+
+            return $"({variables})";
         }
     }
 
-    public class SqlStatementOptions<T> where T : new()
+    public class SqlStatementOptions
     {
+        public SqlStatementOptions()
+        {
+            _propertiesToIgnore = new List<string>();
+        }
+        
         private Casing _casing;
-        public List<string> PropertiesToIgnore { get; set; }
+        private readonly List<string> _propertiesToIgnore;
 
         public void UsePropertyCase(Casing casing)
         {
             _casing = casing;
         }
 
-        public T Props()
+        public List<string> FetchIgnoredProperties()
         {
-            return new T();
+            return _propertiesToIgnore;
         }
 
         public void IgnoreProperty(string name)
         {
-            
+            _propertiesToIgnore.Add(name);
         }
     }
 
@@ -78,9 +118,22 @@ namespace GenericSqlBuilder
         PascalCase,
     }
 
-    public class GenericPropertyBuilder
+    public static class GenericPropertyBuilder<T>
     {
-        
+        public static DataTable GetGenericProperties()
+        {
+            var type = typeof(T);
+            return type.GetProperties()
+                .Aggregate(
+                    new DataTable(),
+                    (acc, cur) =>
+                    {
+                        acc.Columns.Add(cur.Name,
+                            Nullable.GetUnderlyingType(cur.PropertyType)
+                            ?? cur.PropertyType);
+                        return acc;
+                    });
+        }
     }
     
 
