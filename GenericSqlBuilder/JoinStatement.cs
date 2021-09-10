@@ -11,15 +11,9 @@ namespace GenericSqlBuilder
             _statements = statements;
         }
 
-        public JoinStatement On(string property)
+        public Statement On(string property)
         {
             AddStatement($"ON {property} ");
-            return this;
-        }
-
-        public Statement Equals(string property)
-        {
-            AddStatement($"= {property} ");
             return new Statement(_statements);
         }
 

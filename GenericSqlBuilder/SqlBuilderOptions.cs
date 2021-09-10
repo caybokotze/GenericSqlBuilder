@@ -40,26 +40,10 @@ namespace GenericSqlBuilder
     
     public class SqlBuilderOptions : Options
     {
-        public SqlBuilderOptions()
-        {
-            _isAppendStatement = false;
-        }
-        
-        private bool _isAppendStatement;
-        
+        public bool IsAppendStatement { get; set; }
         public string GetAlias()
         {
             return Alias;
-        }
-
-        public bool IsAppendStatement()
-        {
-            return _isAppendStatement;
-        }
-
-        public void SetAppendStatement(bool state)
-        {
-            _isAppendStatement = state;
         }
 
         public Casing GetCase()

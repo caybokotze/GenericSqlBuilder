@@ -28,33 +28,31 @@ namespace GenericSqlBuilder
             });
             result = result.Trim();
             
-            if (!_sqlBuilderOptions.IsAppendStatement())
-            {
-                result += ";";
-            }
+            result += ";";
 
-            if (_sqlBuilderOptions.IsAppendStatement())
-            {
-                result += ", ";
-            }
-            
             return result;
         }
 
-        protected void AddStatement(string statement)
+        protected void AddStatement(string statement, bool trimPrevious = false)
         {
+            if (trimPrevious)
+            {
+                var recentItem = _statements.Last();
+                _statements.Remove(recentItem);
+                _statements.Add(recentItem.TrimEnd());
+            }
             _statements.Add(statement);
         }
 
-        public SqlBuilder Append()
+        public SqlBuilder AppendStatement()
         {
-            _sqlBuilderOptions.SetAppendStatement(true);
-            return new SqlBuilder(_sqlBuilderOptions, GenerateSqlStatement());
+            _sqlBuilderOptions.IsAppendStatement = true;
+            return new SqlBuilder(_sqlBuilderOptions, GenerateSqlStatement() + " ");
         }
         
         public Statement Append(string statement)
         {
-            AddStatement(statement);
+            AddStatement(statement + " ");
             return this;
         }
 

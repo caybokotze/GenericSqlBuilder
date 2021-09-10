@@ -5,39 +5,63 @@ namespace GenericSqlBuilder
 {
     public class SelectStatement : Statement
     {
-        private readonly SqlBuilderOptions _sqlBuilderOptions;
+        private SqlBuilderOptions _sqlBuilderOptions;
+        private bool _appendSelect;
 
         public SelectStatement(string sql, SqlBuilderOptions sqlBuilderOptions = null) : base(sqlBuilderOptions)
         {
+            _appendSelect = false;
             _sqlBuilderOptions = sqlBuilderOptions 
                                    ?? new SqlBuilderOptions();
             
-            if (sqlBuilderOptions != null && !sqlBuilderOptions.IsAppendStatement())
+            switch (_sqlBuilderOptions.IsAppendStatement)
             {
-                AddStatement("SELECT ");
-                AddStatement(sql);
+                case true:
+                    AddStatement(sql);
+                    AddStatement("SELECT ");
+                    break;
+                case false:
+                    AddStatement("SELECT ");
+                    AddStatement(sql);
+                    break;
             }
-            if (sqlBuilderOptions != null && sqlBuilderOptions.IsAppendStatement())
-            {
-                AddStatement(sql);
-            }
-
-            _sqlBuilderOptions.SetAppendStatement(false);
         }
 
         public string LastInserted(Version version)
         {
-            // if (!_sqlBuilderOptions.IsAppendStatement() 
-            //     && !_sqlBuilderOptions.GetAlias().IsNullOrEmpty())
-            // {
-            //     AddStatement("SELECT ");
-            // }
             AddStatement("LAST_INSERT_ID() ");
             return GenerateSqlStatement();
+        }
+
+        public SelectStatement AppendSelect(string sql)
+        {
+            _appendSelect = true;
+            return this;
+        }
+
+        public SelectStatement AppendSelect<T>() where T : class, new()
+        {
+            _appendSelect = true;
+            CreateSelectStatement<T>();
+            return this;
+        }
+
+        public SelectStatement AppendSelect<T>(Action<Options> options) where T : class, new()
+        {
+            _appendSelect = true;
+            var selectStatementOptions = new SqlBuilderOptions();
+            options(_sqlBuilderOptions);
+            // _sqlBuilderOptions = selectStatementOptions;
+            return AppendSelect<T>();
         }
         
         public void CreateSelectStatement<T>()
         {
+            if (_appendSelect)
+            {
+                AddStatement(", ", true);
+            }
+            
             var remove = _sqlBuilderOptions.GetIgnoredProperties();
             var dataTable = GenericPropertyBuilder<T>.GetGenericProperties();
             
@@ -72,23 +96,8 @@ namespace GenericSqlBuilder
             }
             
             AddStatement(string.Join(", ", variableArray) + " ");
-        }
-    }
 
-    public static class CaseConverter
-    {
-        public static string ConvertCase(this string str, Casing casing)
-        {
-            return casing switch
-            {
-                Casing.UpperCase => str.ToUpperInvariant(),
-                Casing.KebabCase => str.ToKebabCase(),
-                Casing.PascalCase => str.ToPascalCase(),
-                Casing.SnakeCase => str.ToSnakeCase(),
-                Casing.LowerCase => str.ToLowerInvariant(),
-                Casing.CamelCase => str.ToCamelCase(),
-                _ => str
-            };
+            _appendSelect = false;
         }
     }
 }

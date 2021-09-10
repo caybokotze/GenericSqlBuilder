@@ -48,7 +48,7 @@ namespace GenericSqlBuilder.Tests
                         .Build();
                     // act
                     // assert
-                    Expect(sql).To.Equal("SELECT id, name, surname, email;");
+                    Expect(sql).To.Equal("SELECT Id, Name, Surname, Email;");
                 }
 
                 [Test]
@@ -63,7 +63,7 @@ namespace GenericSqlBuilder.Tests
                         .Build();
                     // act
                     // assert
-                    Expect(sql).To.Equal("SELECT id, name, surname, email FROM people WHERE id = 1;");
+                    Expect(sql).To.Equal("SELECT Id, Name, Surname, Email FROM people WHERE id = 1;");
                 }
 
                 [Test]
@@ -80,7 +80,7 @@ namespace GenericSqlBuilder.Tests
                         .Build();
                     // act
                     // assert
-                    Expect(sql).To.Equal("SELECT id, name, surname, email FROM people WHERE id = 1 AND name LIKE %John%;");
+                    Expect(sql).To.Equal("SELECT Id, Name, Surname, Email FROM people WHERE id = 1 AND name LIKE %John%;");
                 }
 
                 [TestFixture]
@@ -95,7 +95,7 @@ namespace GenericSqlBuilder.Tests
                             .Select<Person>(o => o.AddIgnoreProperty(nameof(Person.Name)))
                             .Build();
                         // assert
-                        Expect(sql).To.Equal("SELECT id, surname, email;");
+                        Expect(sql).To.Equal("SELECT Id, Surname, Email;");
                     }
                     
                     [Test]
@@ -111,7 +111,7 @@ namespace GenericSqlBuilder.Tests
                             })
                             .Build();
                         // assert
-                        Expect(sql).To.Equal("SELECT id, email;");
+                        Expect(sql).To.Equal("SELECT Id, Email;");
                     }
                     
                     [Test]
@@ -131,7 +131,7 @@ namespace GenericSqlBuilder.Tests
                             .Equals("@Id")
                             .Build();
                         // assert
-                        Expect(sql).To.Equal("SELECT id, email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;");
+                        Expect(sql).To.Equal("SELECT Id, Email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;");
                     }
                 }
                 
@@ -149,7 +149,7 @@ namespace GenericSqlBuilder.Tests
                         .Build();
                     // act
                     // assert
-                    Expect(sql).To.Equal("SELECT id, name, surname, email FROM people WHERE id = 1 AND name LIKE %John%;");
+                    Expect(sql).To.Equal("SELECT Id, Name, Surname, Email FROM people WHERE id = 1 AND name LIKE %John%;");
                 }
 
                 [TestFixture]
@@ -260,7 +260,7 @@ namespace GenericSqlBuilder.Tests
                     .From("people")
                     .Where("id")
                     .Equals("@Id")
-                    .Append()
+                    .AppendStatement()
                     .Select()
                     .LastInserted(Version.MySql);
                 // assert
@@ -289,7 +289,7 @@ namespace GenericSqlBuilder.Tests
             public void ShouldSwitchToNoneIfNotSpecified()
             {
                 // arrange
-                var expected = "SELECT `id`, `name`, `surname`, `email` FROM people WHERE id = @Id;";
+                var expected = "SELECT Id, Name, Surname, Email FROM people WHERE id = @Id;";
                 // act
                 var statement = new SqlBuilder()
                     .Select<Person>()
@@ -305,7 +305,7 @@ namespace GenericSqlBuilder.Tests
             public void ShouldSwitchToMySqlIfMySqlIsSpecified()
             {
                 // arrange
-                var expected = "SELECT `id`, `name`, `surname`, `email` FROM people WHERE id = @Id;";
+                var expected = "SELECT `Id`, `Name`, `Surname`, `Email` FROM people WHERE id = @Id;";
                 // act
                 var statement = new SqlBuilder()
                     .Select<Person>(o =>
@@ -323,7 +323,7 @@ namespace GenericSqlBuilder.Tests
             public void ShouldSwitchToMsSqlIfMsSqlIsSpecified()
             {
                 // arrange
-                var expected = "SELECT [id], [name], [surname], [email] FROM people WHERE id = @Id;";
+                var expected = "SELECT [Id], [Name], [Surname], [Email] FROM people WHERE id = @Id;";
                 // act
                 var statement = new SqlBuilder()
                     .Select<Person>(o =>
@@ -352,8 +352,7 @@ namespace GenericSqlBuilder.Tests
                     // act
                     var sql = new SqlBuilder()
                         .Select<Person>()
-                        .Append()
-                        .Select<Animal>()
+                        .AppendSelect<Animal>()
                         .From("people")
                         .Where("id")
                         .Equals("@Id")
@@ -366,14 +365,56 @@ namespace GenericSqlBuilder.Tests
             [TestFixture]
             public class WithAliases
             {
-                
+                [Test]
+                public void ShouldAppendAliasToSelectStatement()
+                {
+                    // arrange
+                    var expected =
+                        "SELECT p.Id, p.Name, p.Surname, p.Email, a.Age, a.DoesWalk FROM people as p LEFT JOIN animals as a ON p.Id = a.Id;";
+                    // act
+                    var sql = new SqlBuilder()
+                        .Select<Person>(o =>
+                        {
+                            o.AddAlias("p");
+                        })
+                        .AppendSelect<Animal>(o =>
+                        {
+                            o.AddAlias("a");
+                        })
+                        .From("people as p")
+                        .LeftJoin("animals as a")
+                        .On("p.Id = a.Id")
+                        .Build();
+                    // assert
+                    Expect(sql).To.Equal(expected);
+                }
             }
         }
 
         [TestFixture]
-        public class StatementTests
+        public class AppendSelectTests
         {
-            
+            [TestFixture]
+            public class WhenAppendingSelect
+            {
+                [Test]
+                public void ShouldAppendSelectStatement()
+                {
+                    // arrange
+                    var expected = "SELECT id, name, surname, email, age, does_walk FROM people;";
+                    // act
+                    var sql = new SqlBuilder()
+                        .Select<Person>(o =>
+                        {
+                            o.UsePropertyCase(Casing.SnakeCase);
+                        })
+                        .AppendSelect<Animal>()
+                        .From("people")
+                        .Build();
+                    // assert
+                    Expect(sql).To.Equal(expected);
+                }
+            }
         }
     }
 }
