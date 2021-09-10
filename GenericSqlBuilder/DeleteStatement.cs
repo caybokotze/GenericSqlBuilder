@@ -2,7 +2,10 @@
 {
     public class DeleteStatement : Statement
     {
-        
+        public DeleteStatement(SqlBuilderOptions options) : base(options)
+        {
+            
+        }
     }
 }
 

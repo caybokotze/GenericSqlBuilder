@@ -2,7 +2,7 @@
 {
     public class UpdateStatement : Statement
     {
-        public UpdateStatement()
+        public UpdateStatement(SqlBuilderOptions options) : base(options)
         {
             
         }

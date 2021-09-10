@@ -1,27 +1,44 @@
-﻿using PeanutButter.Utils;
+﻿using System;
+using PeanutButter.Utils;
 
 namespace GenericSqlBuilder
 {
     public class SelectStatement : Statement
     {
-        private readonly SqlStatementOptions _sqlStatementOptions;
+        private readonly SqlBuilderOptions _sqlBuilderOptions;
 
-        public SelectStatement(string properties, SqlStatementOptions sqlStatementOptions = null)
+        public SelectStatement(string sql, SqlBuilderOptions sqlBuilderOptions = null) : base(sqlBuilderOptions)
         {
-            _sqlStatementOptions = sqlStatementOptions;
-            AddStatement("SELECT ");
-            AddStatement(properties);
+            _sqlBuilderOptions = sqlBuilderOptions 
+                                   ?? new SqlBuilderOptions();
+            
+            if (sqlBuilderOptions != null && !sqlBuilderOptions.IsAppendStatement())
+            {
+                AddStatement("SELECT ");
+                AddStatement(sql);
+            }
+            if (sqlBuilderOptions != null && sqlBuilderOptions.IsAppendStatement())
+            {
+                AddStatement(sql);
+            }
+
+            _sqlBuilderOptions.SetAppendStatement(false);
         }
 
         public string LastInserted(Version version)
         {
+            // if (!_sqlBuilderOptions.IsAppendStatement() 
+            //     && !_sqlBuilderOptions.GetAlias().IsNullOrEmpty())
+            // {
+            //     AddStatement("SELECT ");
+            // }
             AddStatement("LAST_INSERT_ID() ");
             return GenerateSqlStatement();
         }
         
         public void CreateSelectStatement<T>()
         {
-            var remove = _sqlStatementOptions.GetIgnoredProperties();
+            var remove = _sqlBuilderOptions.GetIgnoredProperties();
             var dataTable = GenericPropertyBuilder<T>.GetGenericProperties();
             
             if (remove != null && remove.Count > 0)
@@ -36,9 +53,24 @@ namespace GenericSqlBuilder
             for (var i = 0; i < dataTable.Columns.Count; i ++)
             {
                 variableArray[i] = dataTable.Columns[i].ColumnName
-                    .ConvertCase(_sqlStatementOptions.GetCase());
-            }
+                    .ConvertCase(_sqlBuilderOptions.GetCase());
 
+                if (!_sqlBuilderOptions.GetAlias().IsNullOrEmpty())
+                {
+                    variableArray[i] = $"{_sqlBuilderOptions.GetAlias()}.{variableArray[i]}";
+                }
+
+                switch (_sqlBuilderOptions.GetSqlVersion())
+                {
+                    case Version.MsSql:
+                        variableArray[i] = $"[{variableArray[i]}]";
+                        break;
+                    case Version.MySql:
+                        variableArray[i] = $"`{variableArray[i]}`";
+                        break;
+                }
+            }
+            
             AddStatement(string.Join(", ", variableArray) + " ");
         }
     }

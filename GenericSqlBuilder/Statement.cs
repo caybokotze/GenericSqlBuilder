@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 
 namespace GenericSqlBuilder
 {
     public class Statement : IStatement
     {
         private List<string> _statements;
+        private SqlBuilderOptions _sqlBuilderOptions;
 
-        protected Statement()
+        public Statement(SqlBuilderOptions options)
         {
+            _sqlBuilderOptions = options;
             _statements = new List<string>();
         }
         
@@ -25,19 +27,38 @@ namespace GenericSqlBuilder
                 result += string.Join(" ", f);
             });
             result = result.Trim();
-            result += ";";
+            
+            if (!_sqlBuilderOptions.IsAppendStatement())
+            {
+                result += ";";
+            }
+
+            if (_sqlBuilderOptions.IsAppendStatement())
+            {
+                result += ", ";
+            }
+            
             return result;
         }
 
         protected void AddStatement(string statement)
         {
-            var semaphore = new SemaphoreSlim(1, 1);
-            semaphore.Wait();
             _statements.Add(statement);
-            semaphore.Release();
         }
 
-        public string Build(Version version)
+        public SqlBuilder Append()
+        {
+            _sqlBuilderOptions.SetAppendStatement(true);
+            return new SqlBuilder(_sqlBuilderOptions, GenerateSqlStatement());
+        }
+        
+        public Statement Append(string statement)
+        {
+            AddStatement(statement);
+            return this;
+        }
+
+        public string Build()
         {
             return GenerateSqlStatement();
         }

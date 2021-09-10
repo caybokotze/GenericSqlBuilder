@@ -2,6 +2,8 @@
 {
     public enum Version
     {
-        MySql
+        Generic,
+        MySql,
+        MsSql
     }
 }

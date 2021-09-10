@@ -4,35 +4,50 @@ namespace GenericSqlBuilder
 {
     public class SqlBuilder
     {
-        private SqlStatementOptions _sqlStatementOptions;
+        private SqlBuilderOptions _sqlBuilderOptions;
+        private string _sql;
 
         public SqlBuilder()
         {
-            _sqlStatementOptions = new SqlStatementOptions();
+            _sqlBuilderOptions = new SqlBuilderOptions();
+            _sql = "";
+        }
+        
+        public SqlBuilder(SqlBuilderOptions options, string sql)
+        {
+            _sqlBuilderOptions = options;
+            _sql = sql;
         }
         
         public SelectStatement Select()
         {
-            return new SelectStatement("* ", _sqlStatementOptions);
+            return new SelectStatement(_sql, _sqlBuilderOptions);
+        }
+
+        public SelectStatement SelectAll()
+        {
+            _sql += "* ";
+            return new SelectStatement(_sql, _sqlBuilderOptions);
         }
 
         public SelectStatement Select(string properties)
         {
-            return new SelectStatement(properties, _sqlStatementOptions);
+            _sql += properties + " ";
+            return new SelectStatement(_sql, _sqlBuilderOptions);
         }
 
         public SelectStatement Select<T>() where T : class, new()
         {
-            var selectStatement = new SelectStatement("", _sqlStatementOptions);
+            var selectStatement = new SelectStatement(_sql, _sqlBuilderOptions);
             selectStatement.CreateSelectStatement<T>();
             return selectStatement;
         }
 
-        public SelectStatement Select<T>(Action<SqlStatementOptions> options) where T : class, new()
+        public SelectStatement Select<T>(Action<Options> options) where T : class, new()
         {
-            var selectStatementOptions = new SqlStatementOptions();
+            var selectStatementOptions = new SqlBuilderOptions();
             options(selectStatementOptions);
-            _sqlStatementOptions = selectStatementOptions;
+            _sqlBuilderOptions = selectStatementOptions;
             return Select<T>();
         }
     }
