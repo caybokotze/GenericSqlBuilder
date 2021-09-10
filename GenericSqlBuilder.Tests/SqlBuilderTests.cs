@@ -24,7 +24,7 @@ namespace GenericSqlBuilder.Tests
                 // arrange
                 var sql = new SqlBuilder()
                     .Select()
-                    .LastInserted(For.MySql);
+                    .LastInserted(Version.MySql);
                 // act
                 // assert
                 Expect(sql).To.Equal("SELECT LAST_INSERT_ID();");
@@ -39,7 +39,7 @@ namespace GenericSqlBuilder.Tests
                     // arrange
                     var sql = new SqlBuilder()
                         .Select<Person>()
-                        .Build(For.MySql);
+                        .Build(Version.MySql);
                     // act
                     // assert
                     Expect(sql).To.Equal("SELECT id, name, surname, email;");
@@ -54,7 +54,7 @@ namespace GenericSqlBuilder.Tests
                         .From("people")
                         .Where("id")
                         .Equals("1")
-                        .Build(For.MySql);
+                        .Build(Version.MySql);
                     // act
                     // assert
                     Expect(sql).To.Equal("SELECT id, name, surname, email FROM people WHERE id = 1;");
@@ -71,7 +71,7 @@ namespace GenericSqlBuilder.Tests
                         .Equals("1")
                         .And("name")
                         .Like("%John%")
-                        .Build(For.MySql);
+                        .Build(Version.MySql);
                     // act
                     // assert
                     Expect(sql).To.Equal("SELECT id, name, surname, email FROM people WHERE id = 1;");
@@ -87,7 +87,7 @@ namespace GenericSqlBuilder.Tests
                         // act
                         var sql = new SqlBuilder()
                             .Select<Person>(o => o.IgnoreProperty(nameof(Person.Name)))
-                            .Build(For.MySql);
+                            .Build(Version.MySql);
                         // assert
                         Expect(sql).To.Equal("SELECT id, surname, email;");
                     }
@@ -103,7 +103,7 @@ namespace GenericSqlBuilder.Tests
                                 o.IgnoreProperty(nameof(Person.Name));
                                 o.IgnoreProperty(nameof(Person.Surname));
                             })
-                            .Build(For.MySql);
+                            .Build(Version.MySql);
                         // assert
                         Expect(sql).To.Equal("SELECT id, email;");
                     }
@@ -123,7 +123,7 @@ namespace GenericSqlBuilder.Tests
                             .LeftJoin("customers").On("people.id").Equals("customers.id")
                             .Where("id")
                             .Equals("@Id")
-                            .Build(For.MySql);
+                            .Build(Version.MySql);
                         // assert
                         Expect(sql).To.Equal("SELECT id, email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;");
                     }
@@ -140,7 +140,7 @@ namespace GenericSqlBuilder.Tests
                         .Equals("1")
                         .And("name")
                         .Like("%John%")
-                        .Build(For.MySql);
+                        .Build(Version.MySql);
                     // act
                     // assert
                     Expect(sql).To.Equal("");
@@ -156,7 +156,7 @@ namespace GenericSqlBuilder.Tests
                         // act
                         var sql = new SqlBuilder()
                             .Select<Person>()
-                            .Build(For.MySql);
+                            .Build(Version.MySql);
                         // assert
                         Expect(sql).To.Equal("SELECT id, name, surname, email;");
                     }
@@ -171,7 +171,7 @@ namespace GenericSqlBuilder.Tests
                             {
                                 o.UsePropertyCase(Casing.UpperCase);
                             })
-                            .Build(For.MySql);
+                            .Build(Version.MySql);
                         // assert
                         Expect(sql).To.Equal("SELECT ID, NAME, SURNAME, EMAIL;");
                     }
