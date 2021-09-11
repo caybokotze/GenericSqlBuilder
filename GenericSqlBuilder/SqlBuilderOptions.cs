@@ -2,75 +2,110 @@
 
 namespace GenericSqlBuilder
 {
-    public class Options
+    public interface ISelectOptions
     {
-        public Options()
+        void UsePropertyCase(Casing casing);
+        void UseSqlVersion(Version version);
+        void AddAlias(string alias);
+        void RemoveSelectProperty(string name);
+        void AddSelectProperty(string name);
+    }
+
+    public interface IInsertOptions
+    {
+        void RemoveInsertProperty(string name);
+        void AddInsertProperty(string name);
+    }
+
+    public class SqlBuilderOptions : ISelectOptions, IInsertOptions
+    {
+        public SqlBuilderOptions()
         {
-            IgnoreProps = new List<string>();
-            CustomProps = new List<string>();
-            Casing = Casing.Default;
-            Version = Version.Generic;
-            Alias = "";
+            _addedInsertProperties = new List<string>();
+            _removedInsertProperties = new List<string>();
+            _removedSelectProperties = new List<string>();
+            _addedSelectProperties = new List<string>();
+            _casing = Casing.Default;
+            _version = Version.Generic;
+            _alias = "";
         }
 
-        protected Casing Casing;
-        protected readonly List<string> IgnoreProps;
-        protected readonly List<string> CustomProps;
-        protected Version Version;
-        protected string Alias;
+        private Casing _casing;
+        private readonly List<string> _removedSelectProperties;
+        private readonly List<string> _addedSelectProperties;
+        private readonly List<string> _addedInsertProperties;
+        private readonly List<string> _removedInsertProperties;
+        private Version _version;
+        private string _alias;
         
         public void UsePropertyCase(Casing casing)
         {
-            Casing = casing;
+            _casing = casing;
         }
 
         public void UseSqlVersion(Version version)
         {
-            Version = version;
+            _version = version;
         }
 
         public void AddAlias(string alias)
         {
-            Alias = alias;
+            _alias = alias;
         }
         
-        public void AddIgnoreProperty(string name)
+        public void RemoveSelectProperty(string name)
         {
-            IgnoreProps.Add(name);
+            _removedSelectProperties.Add(name);
         }
 
-        public void AddProperty(string name)
+        public void AddSelectProperty(string name)
         {
-            CustomProps.Add(name);
+            _addedSelectProperties.Add(name);
         }
-    }
-    
-    public class SqlBuilderOptions : Options
-    {
         public bool IsAppendStatement { get; set; }
         public string GetAlias()
         {
-            return Alias;
+            return _alias;
         }
 
         public Casing GetCase()
         {
-            return Casing;
+            return _casing;
         }
 
-        public List<string> GetIgnoredProperties()
+        public List<string> GetRemovedSelectProperties()
         {
-            return IgnoreProps;
+            return _removedSelectProperties;
         }
 
-        public List<string> GetCustomProperties()
+        public List<string> GetAddedSelectProperties()
         {
-            return CustomProps;
+            return _addedSelectProperties;
         }
 
         public Version GetSqlVersion()
         {
-            return Version;
+            return _version;
+        }
+
+        public void RemoveInsertProperty(string name)
+        {
+            _removedInsertProperties.Add(name);
+        }
+
+        public List<string> GetRemovedInsertProperties()
+        {
+            return _removedInsertProperties;
+        }
+
+        public void AddInsertProperty(string name)
+        {
+            _addedInsertProperties.Add(name);
+        }
+
+        public List<string> GetAddedInsertProperties()
+        {
+            return _addedInsertProperties;
         }
     }
 }

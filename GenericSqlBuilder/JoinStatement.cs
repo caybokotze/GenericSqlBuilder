@@ -6,15 +6,18 @@ namespace GenericSqlBuilder
     public class JoinStatement : IStatement
     {
         private List<string> _statements;
-        public JoinStatement(List<string> statements)
+        private readonly SqlBuilderOptions _options;
+
+        public JoinStatement(List<string> statements, SqlBuilderOptions options)
         {
             _statements = statements;
+            _options = options;
         }
 
-        public Statement On(string property)
+        public SelectStatement On(string property)
         {
             AddStatement($"ON {property} ");
-            return new Statement(_statements);
+            return new SelectStatement(_statements, _options);
         }
 
         private void AddStatement(string statement)

@@ -6,11 +6,11 @@ namespace GenericSqlBuilder
     public class Statement : IStatement
     {
         private List<string> _statements;
-        private SqlBuilderOptions _sqlBuilderOptions;
+        private SqlBuilderOptions _sqlBuilderSqlBuilderOptions;
 
-        public Statement(SqlBuilderOptions options)
+        public Statement(SqlBuilderOptions sqlBuilderOptions)
         {
-            _sqlBuilderOptions = options;
+            _sqlBuilderSqlBuilderOptions = sqlBuilderOptions;
             _statements = new List<string>();
         }
         
@@ -44,10 +44,15 @@ namespace GenericSqlBuilder
             _statements.Add(statement);
         }
 
+        protected List<string> GetStatements()
+        {
+            return _statements;
+        }
+
         public SqlBuilder AppendStatement()
         {
-            _sqlBuilderOptions.IsAppendStatement = true;
-            return new SqlBuilder(_sqlBuilderOptions, GenerateSqlStatement() + " ");
+            _sqlBuilderSqlBuilderOptions.IsAppendStatement = true;
+            return new SqlBuilder(_sqlBuilderSqlBuilderOptions, GenerateSqlStatement() + " ");
         }
         
         public Statement Append(string statement)
@@ -59,66 +64,6 @@ namespace GenericSqlBuilder
         public string Build()
         {
             return GenerateSqlStatement();
-        }
-        
-        public Statement From(string table)
-        {
-            AddStatement($"FROM {table} ");
-            return this;
-        }
-        
-        public Statement Where(string clause)
-        {
-            AddStatement($"WHERE {clause} ");
-            return this;
-        }
-
-        public Statement And(string clause)
-        {
-            AddStatement($"AND {clause} ");
-            return this;
-        }
-
-        public Statement And()
-        {
-            AddStatement($"AND ");
-            return this;
-        }
-
-        public Statement Equals(string clause)
-        {
-            AddStatement($"= {clause} ");
-            return this;
-        }
-
-        public Statement Like(string clause)
-        {
-            AddStatement($"LIKE {clause} ");
-            return this;
-        }
-
-        public Statement Is()
-        {
-            AddStatement("IS ");
-            return this;
-        }
-
-        public JoinStatement LeftJoin(string table)
-        {
-            AddStatement($"LEFT JOIN {table} ");
-            return new JoinStatement(_statements);
-        }
-
-        public JoinStatement RightJoin(string table)
-        {
-            AddStatement($"RIGHT JOIN {table} ");
-            return new JoinStatement(_statements);
-        }
-
-        public JoinStatement InnerJoin(string table)
-        {
-            AddStatement($"INNER JOIN {table} ");
-            return new JoinStatement(_statements);
         }
     }
 }

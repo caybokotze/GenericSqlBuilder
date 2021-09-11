@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using PeanutButter.Utils;
 
 namespace GenericSqlBuilder
@@ -8,7 +9,12 @@ namespace GenericSqlBuilder
         private SqlBuilderOptions _sqlBuilderOptions;
         private bool _appendSelect;
 
-        public SelectStatement(string sql, SqlBuilderOptions sqlBuilderOptions = null) : base(sqlBuilderOptions)
+        public SelectStatement(List<string> statements, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
+        {
+            GenerateSqlStatement();
+        }
+
+        public SelectStatement(string sql, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
         {
             _appendSelect = false;
             _sqlBuilderOptions = sqlBuilderOptions 
@@ -55,11 +61,71 @@ namespace GenericSqlBuilder
             return this;
         }
 
-        public SelectStatement AppendSelect<T>(Action<Options> options) where T : class, new()
+        public SelectStatement AppendSelect<T>(Action<ISelectOptions> options) where T : class, new()
         {
             _appendSelect = true;
             options(_sqlBuilderOptions);
             return AppendSelect<T>();
+        }
+        
+        public SelectStatement From(string table)
+        {
+            AddStatement($"FROM {table} ");
+            return this;
+        }
+        
+        public SelectStatement Where(string clause)
+        {
+            AddStatement($"WHERE {clause} ");
+            return this;
+        }
+
+        public SelectStatement And(string clause)
+        {
+            AddStatement($"AND {clause} ");
+            return this;
+        }
+
+        public SelectStatement And()
+        {
+            AddStatement($"AND ");
+            return this;
+        }
+
+        public SelectStatement Equals(string clause)
+        {
+            AddStatement($"= {clause} ");
+            return this;
+        }
+
+        public SelectStatement Like(string clause)
+        {
+            AddStatement($"LIKE {clause} ");
+            return this;
+        }
+
+        public SelectStatement Is()
+        {
+            AddStatement("IS ");
+            return this;
+        }
+
+        public JoinStatement LeftJoin(string table)
+        {
+            AddStatement($"LEFT JOIN {table} ");
+            return new JoinStatement(GetStatements(), _sqlBuilderOptions);
+        }
+
+        public JoinStatement RightJoin(string table)
+        {
+            AddStatement($"RIGHT JOIN {table} ");
+            return new JoinStatement(GetStatements(), _sqlBuilderOptions);
+        }
+
+        public JoinStatement InnerJoin(string table)
+        {
+            AddStatement($"INNER JOIN {table} ");
+            return new JoinStatement(GetStatements(), _sqlBuilderOptions);
         }
         
         public void CreateSelectStatement<T>()
@@ -69,10 +135,10 @@ namespace GenericSqlBuilder
                 AddStatement(", ", true);
             }
             
-            var remove = _sqlBuilderOptions.GetIgnoredProperties();
+            var remove = _sqlBuilderOptions.GetRemovedSelectProperties();
             var dataTable = GenericPropertyBuilder<T>.GetGenericProperties();
 
-            foreach (var item in _sqlBuilderOptions.GetCustomProperties())
+            foreach (var item in _sqlBuilderOptions.GetAddedSelectProperties())
             {
                 dataTable.Columns.Add(item);
             }

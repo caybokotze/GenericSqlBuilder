@@ -1,57 +1,19 @@
-﻿using NExpect;
+﻿using GenericSqlBuilder.Tests.TestModels;
+using NExpect;
 using NUnit.Framework;
-using PeanutButter.Utils;
 using static NExpect.Expectations;
 
 namespace GenericSqlBuilder.Tests
 {
-    public class Person
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string Email { get; set; }
-    }
-
-    public class Animal
-    {
-        public int Age { get; set; }
-        public bool DoesWalk { get; set; }
-    }
-
     [TestFixture]
     public class SelectStatementTests
     {
         [TestFixture]
-        public class WhenBuildingLastInsertStatements
+        public class WhenBuildingSelectStatements
         {
             [TestFixture]
             public class WithoutGenericBuilder
             {
-                [Test]
-                public void ShouldReturnSelectLastInserted_ForMySql()
-                {
-                    // arrange
-                    var sql = new SqlBuilder()
-                        .Select()
-                        .LastInserted(Version.MySql);
-                    // act
-                    // assert
-                    Expect(sql).To.Equal("SELECT LAST_INSERT_ID();");
-                }
-
-                [Test]
-                public void ShouldReturnSelectLastInserted_ForMsSql()
-                {
-                    // arrange
-                    var sql = new SqlBuilder()
-                        .Select()
-                        .LastInserted(Version.MsSql);
-                    // act
-                    // assert
-                    Expect(sql).To.Equal("SELECT SCOPE_IDENTITY();");
-                }
-
                 [Test]
                 public void ShouldReturnSelectAll()
                 {
@@ -78,6 +40,34 @@ namespace GenericSqlBuilder.Tests
                     // assert
                     Expect(sql).To.Equal("SELECT Id, Name, Surname, Email;");
                 }
+                
+                [TestFixture]
+                public class WithLastInsert
+                {
+                    [Test]
+                    public void ShouldReturnSelectLastInserted_ForMySql()
+                    {
+                        // arrange
+                        var sql = new SqlBuilder()
+                            .Select()
+                            .LastInserted(Version.MySql);
+                        // act
+                        // assert
+                        Expect(sql).To.Equal("SELECT LAST_INSERT_ID();");
+                    }
+
+                    [Test]
+                    public void ShouldReturnSelectLastInserted_ForMsSql()
+                    {
+                        // arrange
+                        var sql = new SqlBuilder()
+                            .Select()
+                            .LastInserted(Version.MsSql);
+                        // act
+                        // assert
+                        Expect(sql).To.Equal("SELECT SCOPE_IDENTITY();");
+                    }
+                }
 
                 [TestFixture]
                 public class WithAppending
@@ -101,11 +91,7 @@ namespace GenericSqlBuilder.Tests
                     }
                 }
             }
-        }
-
-        [TestFixture]
-        public class WhenBuildingSelectStatements
-        {
+            
             [TestFixture]
             public class WithGenericBuilder
             {
@@ -238,7 +224,7 @@ namespace GenericSqlBuilder.Tests
                             // arrange
                             // act
                             var sql = new SqlBuilder()
-                                .Select<Person>(o => o.AddIgnoreProperty(nameof(Person.Name)))
+                                .Select<Person>(o => o.RemoveSelectProperty(nameof(Person.Name)))
                                 .Build();
                             // assert
                             Expect(sql).To.Equal("SELECT Id, Surname, Email;");
@@ -252,8 +238,8 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Select<Person>(o =>
                                 {
-                                    o.AddIgnoreProperty(nameof(Person.Name));
-                                    o.AddIgnoreProperty(nameof(Person.Surname));
+                                    o.RemoveSelectProperty(nameof(Person.Name));
+                                    o.RemoveSelectProperty(nameof(Person.Surname));
                                 })
                                 .Build();
                             // assert
@@ -261,15 +247,17 @@ namespace GenericSqlBuilder.Tests
                         }
 
                         [Test]
-                        public void ShouldBuildSelectWithMultipleRemovedPropertiesAndJoinStatement()
+                        public void ShouldBuildSelectWithMultipleRemovedPropertiesAndLeftJoinStatement()
                         {
                             // arrange
+                            var expected =
+                                "SELECT Id, Email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;";
                             // act
                             var sql = new SqlBuilder()
                                 .Select<Person>(o =>
                                 {
-                                    o.AddIgnoreProperty(nameof(Person.Name));
-                                    o.AddIgnoreProperty(nameof(Person.Surname));
+                                    o.RemoveSelectProperty(nameof(Person.Name));
+                                    o.RemoveSelectProperty(nameof(Person.Surname));
                                 })
                                 .From("people")
                                 .LeftJoin("customers").On("people.id").Equals("customers.id")
@@ -278,8 +266,92 @@ namespace GenericSqlBuilder.Tests
                                 .Build();
                             // assert
                             Expect(sql).To
-                                .Equal(
-                                    "SELECT Id, Email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;");
+                                .Equal(expected);
+                        }
+                        
+                        [Test]
+                        public void ShouldBuildSelectWithMultipleRemovedPropertiesAndInnerJoinStatement()
+                        {
+                            // arrange
+                            var expected =
+                                "SELECT Id, Email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Select<Person>(o =>
+                                {
+                                    o.RemoveSelectProperty(nameof(Person.Name));
+                                    o.RemoveSelectProperty(nameof(Person.Surname));
+                                })
+                                .From("people")
+                                .InnerJoin("customers").On("people.id").Equals("customers.id")
+                                .Where("id")
+                                .Equals("@Id")
+                                .Build();
+                            // assert
+                            Expect(sql).To
+                                .Equal(expected);
+                        }
+                        
+                        [Test]
+                        public void ShouldBuildSelectWithMultipleRemovedPropertiesAndRightJoinStatement()
+                        {
+                            // arrange
+                            var expected =
+                                "SELECT Id, Email FROM people RIGHT JOIN customers ON people.id = customers.id WHERE id = @Id;";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Select<Person>(o =>
+                                {
+                                    o.RemoveSelectProperty(nameof(Person.Name));
+                                    o.RemoveSelectProperty(nameof(Person.Surname));
+                                })
+                                .From("people")
+                                .RightJoin("customers").On("people.id").Equals("customers.id")
+                                .Where("id")
+                                .Equals("@Id")
+                                .Build();
+                            // assert
+                            Expect(sql).To
+                                .Equal(expected);
+                        }
+                    }
+
+                    [TestFixture]
+                    public class WithAddedProperties
+                    {
+                        [Test]
+                        public void SelectStatementShouldGenerateSelectAndAddProperties()
+                        {
+                            // arrange
+                            var expected = "SELECT Age, DoesWalk, Height FROM animals WHERE id = @Id;";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Select<Animal>(o => o.AddSelectProperty("Height"))
+                                .From("animals")
+                                .Where("id = @Id")
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal(expected);
+                        }
+                        
+                        [Test]
+                        public void SelectStatementShouldGenerateSelectAndAddMultipleProperties()
+                        {
+                            // arrange
+                            var expected = "SELECT Age, DoesWalk, Height, Width, Weight FROM animals WHERE id = @Id;";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Select<Animal>(o =>
+                                {
+                                    o.AddSelectProperty("Height");
+                                    o.AddSelectProperty("Width");
+                                    o.AddSelectProperty("Weight");
+                                })
+                                .From("animals")
+                                .Where("id = @Id")
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal(expected);
                         }
                     }
 
