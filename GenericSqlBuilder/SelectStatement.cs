@@ -43,6 +43,9 @@ namespace GenericSqlBuilder
                 case Version.MySql:
                     AddStatement("LAST_INSERT_ID() ");
                     break;
+                default: 
+                    AddStatement("LAST_INSERT_ID() ");
+                    break;
             }
             
             return GenerateSqlStatement();
@@ -128,7 +131,7 @@ namespace GenericSqlBuilder
             return new JoinStatement(GetStatements(), _sqlBuilderOptions);
         }
         
-        public void CreateSelectStatement<T>()
+        public void CreateSelectStatement<T>() where T : class, new()
         {
             if (_appendSelect)
             {
@@ -136,7 +139,7 @@ namespace GenericSqlBuilder
             }
             
             var remove = _sqlBuilderOptions.GetRemovedSelectProperties();
-            var dataTable = GenericPropertyBuilder<T>.GetGenericProperties();
+            var dataTable = GenericPropertyBuilder<T>.GetPropertiesFromType();
 
             foreach (var item in _sqlBuilderOptions.GetAddedSelectProperties())
             {

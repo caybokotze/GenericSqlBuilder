@@ -6,11 +6,11 @@ namespace GenericSqlBuilder
     public class Statement : IStatement
     {
         private List<string> _statements;
-        private SqlBuilderOptions _sqlBuilderSqlBuilderOptions;
+        private SqlBuilderOptions _sqlBuilderOptions;
 
         public Statement(SqlBuilderOptions sqlBuilderOptions)
         {
-            _sqlBuilderSqlBuilderOptions = sqlBuilderOptions;
+            _sqlBuilderOptions = sqlBuilderOptions;
             _statements = new List<string>();
         }
         
@@ -30,6 +30,7 @@ namespace GenericSqlBuilder
             
             result += ";";
 
+            _sqlBuilderOptions.ClearAll();
             return result;
         }
 
@@ -51,8 +52,8 @@ namespace GenericSqlBuilder
 
         public SqlBuilder AppendStatement()
         {
-            _sqlBuilderSqlBuilderOptions.IsAppendStatement = true;
-            return new SqlBuilder(_sqlBuilderSqlBuilderOptions, GenerateSqlStatement() + " ");
+            _sqlBuilderOptions.IsAppendStatement = true;
+            return new SqlBuilder(_sqlBuilderOptions, GenerateSqlStatement() + " ");
         }
         
         public Statement Append(string statement)

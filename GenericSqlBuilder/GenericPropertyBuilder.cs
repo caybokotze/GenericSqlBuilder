@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace GenericSqlBuilder
 {
-    public static class GenericPropertyBuilder<T>
+    public static class GenericPropertyBuilder<T> where T : class, new()
     {
-        public static DataTable GetGenericProperties()
+        public static DataTable GetPropertiesFromType()
         {
             var type = typeof(T);
             return type.GetProperties()

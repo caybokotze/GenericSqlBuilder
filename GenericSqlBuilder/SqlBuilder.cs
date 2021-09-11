@@ -49,25 +49,20 @@ namespace GenericSqlBuilder
             return Select<T>();
         }
 
-        public InsertStatement Insert()
+        public InsertStatement Insert(string table, string properties)
         {
+            _sql += $"{table} ({properties}) ";
             return new InsertStatement(_sql, _sqlBuilderOptions);
         }
 
-        public InsertStatement Insert(string statement)
+        public InsertStatement<T> Insert<T>() where T : class, new()
         {
-            _sql += statement + " ";
-            return new InsertStatement(_sql, _sqlBuilderOptions);
-        }
-
-        public InsertStatement Insert<T>()
-        {
-            var insertStatement = new InsertStatement(_sql, _sqlBuilderOptions);
-            insertStatement.GenerateInsertProperties<T>();
+            var insertStatement = new InsertStatement<T>(_sql, _sqlBuilderOptions);
+            insertStatement.GenerateInsertProperties();
             return insertStatement;
         }
 
-        public InsertStatement Insert<T>(Action<IInsertOptions> options)
+        public InsertStatement<T> Insert<T>(Action<IInsertOptions> options) where T : class, new()
         {
             options(_sqlBuilderOptions);
             return Insert<T>();

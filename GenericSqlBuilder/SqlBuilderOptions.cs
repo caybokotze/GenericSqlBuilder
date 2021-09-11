@@ -2,16 +2,20 @@
 
 namespace GenericSqlBuilder
 {
-    public interface ISelectOptions
+    public interface IBaseOptions
     {
         void UsePropertyCase(Casing casing);
+    }
+    
+    public interface ISelectOptions : IBaseOptions
+    {
         void UseSqlVersion(Version version);
         void AddAlias(string alias);
         void RemoveSelectProperty(string name);
         void AddSelectProperty(string name);
     }
 
-    public interface IInsertOptions
+    public interface IInsertOptions : IBaseOptions
     {
         void RemoveInsertProperty(string name);
         void AddInsertProperty(string name);
@@ -37,6 +41,14 @@ namespace GenericSqlBuilder
         private readonly List<string> _removedInsertProperties;
         private Version _version;
         private string _alias;
+
+        public void ClearAll()
+        {
+            _addedInsertProperties.Clear();
+            _addedSelectProperties.Clear();
+            _removedInsertProperties.Clear();
+            _removedSelectProperties.Clear();
+        }
         
         public void UsePropertyCase(Casing casing)
         {
