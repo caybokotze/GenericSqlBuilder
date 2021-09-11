@@ -7,6 +7,7 @@ namespace GenericSqlBuilder
         public Options()
         {
             IgnoreProps = new List<string>();
+            CustomProps = new List<string>();
             Casing = Casing.Default;
             Version = Version.Generic;
             Alias = "";
@@ -14,6 +15,7 @@ namespace GenericSqlBuilder
 
         protected Casing Casing;
         protected readonly List<string> IgnoreProps;
+        protected readonly List<string> CustomProps;
         protected Version Version;
         protected string Alias;
         
@@ -36,6 +38,11 @@ namespace GenericSqlBuilder
         {
             IgnoreProps.Add(name);
         }
+
+        public void AddProperty(string name)
+        {
+            CustomProps.Add(name);
+        }
     }
     
     public class SqlBuilderOptions : Options
@@ -54,6 +61,11 @@ namespace GenericSqlBuilder
         public List<string> GetIgnoredProperties()
         {
             return IgnoreProps;
+        }
+
+        public List<string> GetCustomProperties()
+        {
+            return CustomProps;
         }
 
         public Version GetSqlVersion()

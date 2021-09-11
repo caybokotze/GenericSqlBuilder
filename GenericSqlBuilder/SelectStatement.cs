@@ -29,7 +29,16 @@ namespace GenericSqlBuilder
 
         public string LastInserted(Version version)
         {
-            AddStatement("LAST_INSERT_ID() ");
+            switch (version)
+            {
+                case Version.MsSql:
+                    AddStatement("SCOPE_IDENTITY() ");
+                    break;
+                case Version.MySql:
+                    AddStatement("LAST_INSERT_ID() ");
+                    break;
+            }
+            
             return GenerateSqlStatement();
         }
 
@@ -49,9 +58,7 @@ namespace GenericSqlBuilder
         public SelectStatement AppendSelect<T>(Action<Options> options) where T : class, new()
         {
             _appendSelect = true;
-            var selectStatementOptions = new SqlBuilderOptions();
             options(_sqlBuilderOptions);
-            // _sqlBuilderOptions = selectStatementOptions;
             return AppendSelect<T>();
         }
         
@@ -64,6 +71,11 @@ namespace GenericSqlBuilder
             
             var remove = _sqlBuilderOptions.GetIgnoredProperties();
             var dataTable = GenericPropertyBuilder<T>.GetGenericProperties();
+
+            foreach (var item in _sqlBuilderOptions.GetCustomProperties())
+            {
+                dataTable.Columns.Add(item);
+            }
             
             if (remove != null && remove.Count > 0)
             {
