@@ -6,11 +6,18 @@ namespace GenericSqlBuilder
 {
     public class SelectStatement : Statement
     {
-        private SqlBuilderOptions _sqlBuilderOptions;
+        private readonly SqlBuilderOptions _sqlBuilderOptions;
         private bool _appendSelect;
 
         public SelectStatement(List<string> statements, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
         {
+            foreach (var item in statements)
+            {
+                AddStatement(item);
+            }
+
+            _sqlBuilderOptions = sqlBuilderOptions;
+            
             GenerateSqlStatement();
         }
 

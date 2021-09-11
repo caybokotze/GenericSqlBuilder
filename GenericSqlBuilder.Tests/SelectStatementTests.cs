@@ -274,7 +274,7 @@ namespace GenericSqlBuilder.Tests
                         {
                             // arrange
                             var expected =
-                                "SELECT Id, Email FROM people LEFT JOIN customers ON people.id = customers.id WHERE id = @Id;";
+                                "SELECT Id, Email FROM people INNER JOIN customers ON people.id = customers.id WHERE id = @Id;";
                             // act
                             var sql = new SqlBuilder()
                                 .Select<Person>(o =>

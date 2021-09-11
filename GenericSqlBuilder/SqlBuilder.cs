@@ -55,17 +55,18 @@ namespace GenericSqlBuilder
             return new InsertStatement(_sql, _sqlBuilderOptions);
         }
 
-        public InsertStatement<T> Insert<T>() where T : class, new()
+        public InsertStatement<T> Insert<T>(string table) where T : class, new()
         {
+            _sql += table + " ";
             var insertStatement = new InsertStatement<T>(_sql, _sqlBuilderOptions);
             insertStatement.GenerateInsertProperties();
             return insertStatement;
         }
 
-        public InsertStatement<T> Insert<T>(Action<IInsertOptions> options) where T : class, new()
+        public InsertStatement<T> Insert<T>(string table, Action<IInsertOptions> options) where T : class, new()
         {
             options(_sqlBuilderOptions);
-            return Insert<T>();
+            return Insert<T>(table);
         }
     }
 }

@@ -42,10 +42,14 @@ namespace GenericSqlBuilder
         {
             _sql = sql;
             _sqlBuilderOptions = sqlBuilderOptions;
+            
+            AddStatement("INSERT INTO ");
+            AddStatement(sql);
         }
 
         public InsertStatement<T> Values()
         {
+            AddStatement("VALUES ");
             GenerateInsertAttributes();
             return this;
         }
@@ -72,13 +76,12 @@ namespace GenericSqlBuilder
             
             for (var i = 0; i < dataTable.Columns.Count; i ++)
             {
-                variableArray[i] = dataTable.Columns[i].ColumnName
-                    .ConvertCase(_sqlBuilderOptions.GetCase());
+                variableArray[i] = dataTable.Columns[i].ColumnName;
 
                 variableArray[i] = $"@{variableArray[i]}";
             }
             
-            AddStatement(string.Join(", ", variableArray) + " ");
+            AddStatement($"({string.Join(", ", variableArray)})" + " ");
         }
         
         public void GenerateInsertProperties()
@@ -117,7 +120,7 @@ namespace GenericSqlBuilder
                 }
             }
             
-            AddStatement(string.Join(", ", variableArray) + " ");
+            AddStatement($"({string.Join(", ", variableArray)})" + " ");
         }
     }
 }
