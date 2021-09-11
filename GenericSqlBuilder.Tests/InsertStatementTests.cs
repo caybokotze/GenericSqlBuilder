@@ -24,18 +24,43 @@ namespace GenericSqlBuilder.Tests
                         public void ShouldBuildInsertStatementAndAppendLastSelected()
                         {
                             // arrange
-                            var expected = "INSERT INTO people (id, name, surname, )"
+                            var expected =
+                                "INSERT INTO people (id, name, surname, email) VALUES (@Id, @Name, @Surname, @Email); SELECT LAST_INSERT_ID();";
                             // act
+                            var sql = new SqlBuilder()
+                                .Insert<Person>("people", o =>
+                                {
+                                    o.UsePropertyCase(Casing.LowerCase);
+                                })
+                                .Values()
+                                .AppendStatement()
+                                .Select()
+                                .LastInserted(Version.MySql);
                             // assert
+                            Expect(sql).To.Equal(expected);
                         }
                     }
 
                     [TestFixture]
                     public class WithAppendedCustomProperties
                     {
-                        // arrange
-                        // act
-                        // assert
+                        [Test]
+                        public void ShouldAppendCustomPropertyAndAttribute()
+                        {
+                            // arrange
+                            var expected =
+                                "INSERT INTO people (Id, Name, Surname, Email, Height) VALUES (@Id, @Name, @Surname, @Email, @Height);";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Insert<Person>("people", o =>
+                                {
+                                    o.AddInsertProperty("Height");
+                                })
+                                .Values()
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal(expected);
+                        }
                     }
 
                     [TestFixture]

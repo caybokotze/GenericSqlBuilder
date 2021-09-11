@@ -56,10 +56,10 @@ namespace GenericSqlBuilder
 
         private void GenerateInsertAttributes()
         {
-            var remove = _sqlBuilderOptions.GetRemovedSelectProperties();
+            var remove = _sqlBuilderOptions.GetRemovedInsertProperties();
             var dataTable = GenericPropertyBuilder<T>.GetPropertiesFromType();
 
-            foreach (var item in _sqlBuilderOptions.GetAddedSelectProperties())
+            foreach (var item in _sqlBuilderOptions.GetAddedInsertProperties())
             {
                 dataTable.Columns.Add(item);
             }
