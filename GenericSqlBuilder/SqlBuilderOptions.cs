@@ -5,11 +5,17 @@ namespace GenericSqlBuilder
     public interface IBaseOptions
     {
         void UsePropertyCase(Casing casing);
+        void UseSqlVersion(Version version);
     }
-    
+
+    public interface IUpdateOptions : IBaseOptions
+    {
+        void AddUpdateProperty(string name);
+        void RemoveUpdateProperty(string name);
+    }
+
     public interface ISelectOptions : IBaseOptions
     {
-        void UseSqlVersion(Version version);
         void AddAlias(string alias);
         void RemoveSelectProperty(string name);
         void AddSelectProperty(string name);
@@ -21,7 +27,7 @@ namespace GenericSqlBuilder
         void AddInsertProperty(string name);
     }
 
-    public class SqlBuilderOptions : ISelectOptions, IInsertOptions
+    public class SqlBuilderOptions : ISelectOptions, IInsertOptions, IUpdateOptions
     {
         public SqlBuilderOptions()
         {
@@ -29,6 +35,8 @@ namespace GenericSqlBuilder
             _removedInsertProperties = new List<string>();
             _removedSelectProperties = new List<string>();
             _addedSelectProperties = new List<string>();
+            _addedUpdateProperties = new List<string>();
+            _removedUpdateProperties = new List<string>();
             _casing = Casing.Default;
             _version = Version.Generic;
             _alias = "";
@@ -39,6 +47,8 @@ namespace GenericSqlBuilder
         private readonly List<string> _addedSelectProperties;
         private readonly List<string> _addedInsertProperties;
         private readonly List<string> _removedInsertProperties;
+        private readonly List<string> _removedUpdateProperties;
+        private readonly List<string> _addedUpdateProperties;
         private Version _version;
         private string _alias;
 
@@ -48,6 +58,8 @@ namespace GenericSqlBuilder
             _addedSelectProperties.Clear();
             _removedInsertProperties.Clear();
             _removedSelectProperties.Clear();
+            _removedUpdateProperties.Clear();
+            _addedUpdateProperties.Clear();
         }
         
         public void UsePropertyCase(Casing casing)
@@ -118,6 +130,16 @@ namespace GenericSqlBuilder
         public List<string> GetAddedInsertProperties()
         {
             return _addedInsertProperties;
+        }
+
+        public void AddUpdateProperty(string name)
+        {
+            _addedUpdateProperties.Add(name);
+        }
+
+        public void RemoveUpdateProperty(string name)
+        {
+            _removedUpdateProperties.Add(name);
         }
     }
 }

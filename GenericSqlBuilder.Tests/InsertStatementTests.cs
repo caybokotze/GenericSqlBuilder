@@ -66,9 +66,23 @@ namespace GenericSqlBuilder.Tests
                     [TestFixture]
                     public class WithRemovedCustomProperties
                     {
-                        // arrange
-                        // act
-                        // assert
+                        [Test]
+                        public void ShouldRemoveCustomPropertyAndRemoveAttribute()
+                        {
+                            // arrange
+                            var expected =
+                                "INSERT INTO people (Id, Name, Email) VALUES (@Id, @Name, @Email);";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Insert<Person>("people", o =>
+                                {
+                                    o.RemoveInsertProperty(nameof(Person.Surname));
+                                })
+                                .Values()
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal(expected);
+                        }
                     }
 
                     public class WithCaseConvertingOptions
@@ -118,7 +132,7 @@ namespace GenericSqlBuilder.Tests
                         {
                             // arrange
                             var expected =
-                                @"INSERT INTO people (age, does-walk) VALUES (@Id, @Name, @Surname, @Email);";
+                                @"INSERT INTO people (age, does-walk) VALUES (@Age, @DoesWalk);";
                             // act
                             var sql = new SqlBuilder()
                                 .Insert<Animal>("people", o =>
@@ -139,7 +153,7 @@ namespace GenericSqlBuilder.Tests
                         {
                             // arrange
                             var expected =
-                                @"INSERT INTO people (age, does_walk) VALUES (@Id, @Name, @Surname, @Email);";
+                                @"INSERT INTO people (age, does_walk) VALUES (@Age, @DoesWalk);";
                             // act
                             var sql = new SqlBuilder()
                                 .Insert<Animal>("people", o => { o.UsePropertyCase(Casing.SnakeCase); })
@@ -150,6 +164,46 @@ namespace GenericSqlBuilder.Tests
                                 .To
                                 .Equal(expected);
                         }
+                    }
+
+                    [TestFixture]
+                    public class WithSqlVersioning
+                    {
+                        [Test]
+                        public void ShouldBuildInsertStatement_ForMySql()
+                        {
+                            // arrange
+                            var expected = "INSERT INTO people (id, name, surname, email) VALUES (@Id, @Name, @Surname, @Email)";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Insert<Person>("people", o =>
+                                {
+                                    o.UseSqlVersion(Version.MySql);
+                                    o.UsePropertyCase(Casing.SnakeCase);
+                                })
+                                .Values()
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal(expected);
+                        }
+                    }
+
+                    [Test]
+                    public void ShouldBuildInsertStatement_ForMsSql()
+                    {
+                        // arrange
+                        var expected = "INSERT INTO people (id, name, surname, email) VALUES (@Id, @Name, @Surname, @Email)";
+                        // act
+                        var sql = new SqlBuilder()
+                            .Insert<Person>("people", o =>
+                            {
+                                o.UseSqlVersion(Version.MsSql);
+                                o.UsePropertyCase(Casing.SnakeCase);
+                            })
+                            .Values()
+                            .Build();
+                        // assert
+                        Expect(sql).To.Equal(expected);
                     }
                 }
                 

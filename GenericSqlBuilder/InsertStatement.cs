@@ -17,15 +17,6 @@ namespace GenericSqlBuilder
             AddStatement(sql);
         }
 
-        // public InsertStatement(List<string> statements, SqlBuilderOptions sqlBuilderOptions) : base(statements)
-        // {
-        //     _sqlBuilderOptions = sqlBuilderOptions;
-        //     foreach (var item in statements)
-        //     {
-        //         AddStatement(item);
-        //     }
-        // }
-
         public InsertStatement Values(string values)
         {
             AddStatement($"VALUES ({values}) ");

@@ -68,5 +68,25 @@ namespace GenericSqlBuilder
             options(_sqlBuilderOptions);
             return Insert<T>(table);
         }
+
+        public UpdateStatement Update(string table)
+        {
+            _sql += table + " ";
+            return new UpdateStatement(_sql, _sqlBuilderOptions);
+        }
+
+        public UpdateStatement Update<T>(string table)
+        {
+            _sql += table + " ";
+            var updateStatement = new UpdateStatement(_sql, _sqlBuilderOptions);
+            updateStatement.GenerateUpdateProperties();
+            return updateStatement;
+        }
+
+        public UpdateStatement Update<T>(string table, Action<IUpdateOptions> options)
+        {
+            options(_sqlBuilderOptions);
+            return Update<T>(table);
+        }
     }
 }
