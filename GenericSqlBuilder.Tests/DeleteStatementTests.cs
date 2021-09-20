@@ -1,5 +1,4 @@
 ﻿using NExpect;
-using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 using static NExpect.Expectations;
 
@@ -30,18 +29,41 @@ namespace GenericSqlBuilder.Tests
         [TestFixture]
         public class WhenDeleteStatementIsNotComplete
         {
-            [Test]
-            public void ShouldThrowException()
+            [TestFixture]
+            public class WithoutFromStatement
             {
-                // arrange
-                // act
-                var sqlBuilder = new SqlBuilder()
-                    .Delete()
-                    .Where("id = @id");
-                Expect(() => sqlBuilder.Build())
-                    .To.Throw<InvalidSqlStatementException>()
-                    .With.Message.Containing("Your delete statement syntax is incorrect.");
-                // assert
+                [Test]
+                public void ShouldThrowException()
+                {
+                    // arrange
+                    // act
+                    var sqlBuilder = new SqlBuilder()
+                        .Delete()
+                        .Where("id = @id");
+                    Expect(() => sqlBuilder.Build())
+                        .To.Throw<InvalidSqlStatementException>()
+                        .With.Message.Containing("Your delete statement syntax is incorrect.");
+                    // assert
+                }
+            }
+
+
+            [TestFixture]
+            public class WithoutWhereStatement
+            {
+                [Test]
+                public void ShouldThrowException()
+                {
+                    // arrange
+                    // act
+                    var sqlBuilder = new SqlBuilder()
+                        .Delete()
+                        .From("people");
+                    Expect(() => sqlBuilder.Build())
+                        .To.Throw<InvalidSqlStatementException>()
+                        .With.Message.Containing("Your delete statement syntax is incorrect.");
+                    // assert
+                }
             }
         }
     }
