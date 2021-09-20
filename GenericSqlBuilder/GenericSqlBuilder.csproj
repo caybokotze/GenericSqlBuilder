@@ -11,12 +11,20 @@
         <RepositoryType>github</RepositoryType>
         <PackageTags>sql builder, generic sql builder</PackageTags>
         <Copyright>A product of Merge Digital</Copyright>
-        <PackageLicenseFile>https://raw.githubusercontent.com/caybokotze/GenericSqlBuilder/master/license.txt</PackageLicenseFile>
+        <PackageLicenseFile>license.txt</PackageLicenseFile>
         <PackageReleaseNotes>First stable tested public release.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="PeanutButter.Utils" Version="2.0.36" />
+        <PackageReference Include="PeanutButter.Utils" Version="2.0.36"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="resources\license.txt">
+            <Pack>true</Pack>
+            <PackagePath>license.txt</PackagePath>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

@@ -4,17 +4,14 @@ namespace GenericSqlBuilder
 {
     public class DeleteStatement : Statement
     {
-        private readonly string _sql;
-        private Statement _statement;
         private bool _fromClauseHasExecuted;
 
         public DeleteStatement(string sql, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
         {
-            _sql = sql;
             StatementIsComplete = false;
             _fromClauseHasExecuted = false;
             StatementType = StatementType.Delete;
-            AddStatement(_sql);
+            AddStatement(sql);
             AddStatement("DELETE ");
         }
 
