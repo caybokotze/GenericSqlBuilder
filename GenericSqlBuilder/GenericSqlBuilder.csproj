@@ -2,6 +2,17 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <Title>GenericSqlBuilder</Title>
+        <Authors>Caybo Kotze</Authors>
+        <Company>Merge Digital</Company>
+        <Description>Generic Sql Builder is a tool that you can use to create straight forward generic statements.</Description>
+        <PackageProjectUrl>https://github.com/caybokotze/genericsqlbuilder</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/caybokotze/genericsqlbuilder</RepositoryUrl>
+        <RepositoryType>github</RepositoryType>
+        <PackageTags>sql builder, generic sql builder</PackageTags>
+        <Copyright>A product of Merge Digital</Copyright>
+        <PackageLicenseFile>https://github.com/caybokotze/genericsqlbuilder/license.txt</PackageLicenseFile>
+        <PackageReleaseNotes>First stable tested public release.</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
