@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace GenericSqlBuilder
@@ -7,6 +8,8 @@ namespace GenericSqlBuilder
     {
         private List<string> _statements;
         private SqlBuilderOptions _sqlBuilderOptions;
+        protected bool StatementIsComplete = true;
+        protected StatementType StatementType;
 
         public Statement(SqlBuilderOptions sqlBuilderOptions)
         {
@@ -14,9 +17,10 @@ namespace GenericSqlBuilder
             _statements = new List<string>();
         }
         
-        public Statement(List<string> statements)
+        public Statement(List<string> statements, SqlBuilderOptions sqlBuilderOptions)
         {
             _statements = statements;
+            _sqlBuilderOptions = sqlBuilderOptions;
         }
 
         protected string GenerateSqlStatement()
@@ -64,7 +68,20 @@ namespace GenericSqlBuilder
 
         public string Build()
         {
+            ShouldThrowOnInvalidStatement();
             return GenerateSqlStatement();
+        }
+
+        private void ShouldThrowOnInvalidStatement()
+        {
+            if (StatementType == StatementType.Delete)
+            {
+                if (!StatementIsComplete)
+                {
+                    throw new InvalidSqlStatementException(
+                        "Your delete statement syntax is incorrect. You need to define a FROM and a WHERE clause.");
+                }
+            }
         }
     }
 }

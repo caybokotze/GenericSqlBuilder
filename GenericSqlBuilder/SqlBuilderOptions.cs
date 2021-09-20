@@ -137,9 +137,19 @@ namespace GenericSqlBuilder
             _addedUpdateProperties.Add(name);
         }
 
+        public List<string> GetAddedUpdateProperties()
+        {
+            return _removedUpdateProperties;
+        }
+
         public void RemoveUpdateProperty(string name)
         {
             _removedUpdateProperties.Add(name);
+        }
+
+        public List<string> GetRemovedUpdateProperties()
+        {
+            return _removedUpdateProperties;
         }
     }
 }

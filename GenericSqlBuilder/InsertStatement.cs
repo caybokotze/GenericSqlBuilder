@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using PeanutButter.Utils;
-
-namespace GenericSqlBuilder
+﻿namespace GenericSqlBuilder
 {
     public class InsertStatement : Statement
     {

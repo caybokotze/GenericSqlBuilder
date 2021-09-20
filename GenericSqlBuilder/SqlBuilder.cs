@@ -2,6 +2,14 @@
 
 namespace GenericSqlBuilder
 {
+    public static class StaticSqlBuilder
+    {
+        public static SqlBuilder Sql()
+        {
+            return new SqlBuilder();
+        }
+    }
+    
     public class SqlBuilder
     {
         private SqlBuilderOptions _sqlBuilderOptions;
@@ -75,18 +83,22 @@ namespace GenericSqlBuilder
             return new UpdateStatement(_sql, _sqlBuilderOptions);
         }
 
-        public UpdateStatement Update<T>(string table)
+        public UpdateStatement<T> Update<T>(string table) where T : class, new()
         {
             _sql += table + " ";
-            var updateStatement = new UpdateStatement(_sql, _sqlBuilderOptions);
-            updateStatement.GenerateUpdateProperties();
+            var updateStatement = new UpdateStatement<T>(_sql, _sqlBuilderOptions);
             return updateStatement;
         }
 
-        public UpdateStatement Update<T>(string table, Action<IUpdateOptions> options)
+        public UpdateStatement<T> Update<T>(string table, Action<IUpdateOptions> options) where T : class, new()
         {
             options(_sqlBuilderOptions);
             return Update<T>(table);
+        }
+
+        public DeleteStatement Delete()
+        {
+            return new DeleteStatement(_sql, _sqlBuilderOptions);
         }
     }
 }

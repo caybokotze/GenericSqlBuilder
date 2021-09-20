@@ -173,7 +173,7 @@ namespace GenericSqlBuilder.Tests
                         public void ShouldBuildInsertStatement_ForMySql()
                         {
                             // arrange
-                            var expected = "INSERT INTO people (id, name, surname, email) VALUES (@Id, @Name, @Surname, @Email)";
+                            var expected = "INSERT INTO people (`id`, `name`, `surname`, `email`) VALUES (@Id, @Name, @Surname, @Email);";
                             // act
                             var sql = new SqlBuilder()
                                 .Insert<Person>("people", o =>
@@ -186,24 +186,24 @@ namespace GenericSqlBuilder.Tests
                             // assert
                             Expect(sql).To.Equal(expected);
                         }
-                    }
-
-                    [Test]
-                    public void ShouldBuildInsertStatement_ForMsSql()
-                    {
-                        // arrange
-                        var expected = "INSERT INTO people (id, name, surname, email) VALUES (@Id, @Name, @Surname, @Email)";
-                        // act
-                        var sql = new SqlBuilder()
-                            .Insert<Person>("people", o =>
-                            {
-                                o.UseSqlVersion(Version.MsSql);
-                                o.UsePropertyCase(Casing.SnakeCase);
-                            })
-                            .Values()
-                            .Build();
-                        // assert
-                        Expect(sql).To.Equal(expected);
+                        
+                        [Test]
+                        public void ShouldBuildInsertStatement_ForMsSql()
+                        {
+                            // arrange
+                            var expected = "INSERT INTO people ([id], [name], [surname], [email]) VALUES (@Id, @Name, @Surname, @Email);";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Insert<Person>("people", o =>
+                                {
+                                    o.UseSqlVersion(Version.MsSql);
+                                    o.UsePropertyCase(Casing.SnakeCase);
+                                })
+                                .Values()
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal(expected);
+                        }
                     }
                 }
                 
