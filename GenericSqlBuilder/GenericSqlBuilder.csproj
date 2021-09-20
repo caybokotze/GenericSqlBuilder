@@ -11,7 +11,7 @@
         <RepositoryType>github</RepositoryType>
         <PackageTags>sql builder, generic sql builder</PackageTags>
         <Copyright>A product of Merge Digital</Copyright>
-        <PackageLicenseFile>https://github.com/caybokotze/genericsqlbuilder/license.txt</PackageLicenseFile>
+        <PackageLicenseFile>https://raw.githubusercontent.com/caybokotze/GenericSqlBuilder/master/license.txt</PackageLicenseFile>
         <PackageReleaseNotes>First stable tested public release.</PackageReleaseNotes>
     </PropertyGroup>
 
