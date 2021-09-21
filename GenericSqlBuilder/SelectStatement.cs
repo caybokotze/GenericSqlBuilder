@@ -145,10 +145,10 @@ namespace GenericSqlBuilder
                 AddStatement(", ", true);
             }
             
-            var remove = _sqlBuilderOptions.GetRemovedSelectProperties();
+            var remove = _sqlBuilderOptions.GetRemovedProperties();
             var dataTable = GenericPropertyBuilder<T>.GetPropertiesFromType();
 
-            foreach (var item in _sqlBuilderOptions.GetAddedSelectProperties())
+            foreach (var item in _sqlBuilderOptions.GetAddedProperties())
             {
                 dataTable.Columns.Add(item);
             }

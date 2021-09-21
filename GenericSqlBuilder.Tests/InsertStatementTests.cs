@@ -54,7 +54,7 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Insert<Person>("people", o =>
                                 {
-                                    o.AddInsertProperty("Height");
+                                    o.AddProperty("Height");
                                 })
                                 .Values()
                                 .Build();
@@ -76,7 +76,7 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Insert<Person>("people", o =>
                                 {
-                                    o.RemoveInsertProperty(nameof(Person.Surname));
+                                    o.RemoveProperty(nameof(Person.Surname));
                                 })
                                 .Values()
                                 .Build();

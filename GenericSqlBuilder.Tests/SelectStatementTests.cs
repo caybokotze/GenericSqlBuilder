@@ -1,4 +1,5 @@
-﻿using GenericSqlBuilder.Tests.TestModels;
+﻿using System.Collections.Generic;
+using GenericSqlBuilder.Tests.TestModels;
 using NExpect;
 using NUnit.Framework;
 using static NExpect.Expectations;
@@ -224,7 +225,7 @@ namespace GenericSqlBuilder.Tests
                             // arrange
                             // act
                             var sql = new SqlBuilder()
-                                .Select<Person>(o => o.RemoveSelectProperty(nameof(Person.Name)))
+                                .Select<Person>(o => o.RemoveProperty(nameof(Person.Name)))
                                 .Build();
                             // assert
                             Expect(sql).To.Equal("SELECT Id, Surname, Email;");
@@ -238,8 +239,27 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Select<Person>(o =>
                                 {
-                                    o.RemoveSelectProperty(nameof(Person.Name));
-                                    o.RemoveSelectProperty(nameof(Person.Surname));
+                                    o.RemoveProperty(nameof(Person.Name));
+                                    o.RemoveProperty(nameof(Person.Surname));
+                                })
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal("SELECT Id, Email;");
+                        }
+                        
+                        [Test]
+                        public void ShouldBuildSelectWithMultipleRemovedPropertiesUsingMultiRemove()
+                        {
+                            // arrange
+                            // act
+                            var sql = new SqlBuilder()
+                                .Select<Person>(o =>
+                                {
+                                    o.RemoveMultipleProperties(new List<string>
+                                    {
+                                        nameof(Person.Name),
+                                        nameof(Person.Surname)
+                                    });
                                 })
                                 .Build();
                             // assert
@@ -256,8 +276,8 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Select<Person>(o =>
                                 {
-                                    o.RemoveSelectProperty(nameof(Person.Name));
-                                    o.RemoveSelectProperty(nameof(Person.Surname));
+                                    o.RemoveProperty(nameof(Person.Name));
+                                    o.RemoveProperty(nameof(Person.Surname));
                                 })
                                 .From("people")
                                 .LeftJoin("customers").On("people.id").Equals("customers.id")
@@ -279,8 +299,8 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Select<Person>(o =>
                                 {
-                                    o.RemoveSelectProperty(nameof(Person.Name));
-                                    o.RemoveSelectProperty(nameof(Person.Surname));
+                                    o.RemoveProperty(nameof(Person.Name));
+                                    o.RemoveProperty(nameof(Person.Surname));
                                 })
                                 .From("people")
                                 .InnerJoin("customers").On("people.id").Equals("customers.id")
@@ -302,8 +322,8 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Select<Person>(o =>
                                 {
-                                    o.RemoveSelectProperty(nameof(Person.Name));
-                                    o.RemoveSelectProperty(nameof(Person.Surname));
+                                    o.RemoveProperty(nameof(Person.Name));
+                                    o.RemoveProperty(nameof(Person.Surname));
                                 })
                                 .From("people")
                                 .RightJoin("customers").On("people.id").Equals("customers.id")
@@ -326,7 +346,7 @@ namespace GenericSqlBuilder.Tests
                             var expected = "SELECT Age, DoesWalk, Height FROM animals WHERE id = @Id;";
                             // act
                             var sql = new SqlBuilder()
-                                .Select<Animal>(o => o.AddSelectProperty("Height"))
+                                .Select<Animal>(o => o.AddProperty("Height"))
                                 .From("animals")
                                 .Where("id = @Id")
                                 .Build();
@@ -343,9 +363,9 @@ namespace GenericSqlBuilder.Tests
                             var sql = new SqlBuilder()
                                 .Select<Animal>(o =>
                                 {
-                                    o.AddSelectProperty("Height");
-                                    o.AddSelectProperty("Width");
-                                    o.AddSelectProperty("Weight");
+                                    o.AddProperty("Height");
+                                    o.AddProperty("Width");
+                                    o.AddProperty("Weight");
                                 })
                                 .From("animals")
                                 .Where("id = @Id")

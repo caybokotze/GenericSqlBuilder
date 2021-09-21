@@ -71,7 +71,7 @@ namespace GenericSqlBuilder
             return insertStatement;
         }
 
-        public InsertStatement<T> Insert<T>(string table, Action<IInsertOptions> options) where T : class, new()
+        public InsertStatement<T> Insert<T>(string table, Action<IBaseOptions> options) where T : class, new()
         {
             options(_sqlBuilderOptions);
             return Insert<T>(table);
@@ -90,7 +90,7 @@ namespace GenericSqlBuilder
             return updateStatement;
         }
 
-        public UpdateStatement<T> Update<T>(string table, Action<IUpdateOptions> options) where T : class, new()
+        public UpdateStatement<T> Update<T>(string table, Action<IBaseOptions> options) where T : class, new()
         {
             options(_sqlBuilderOptions);
             return Update<T>(table);

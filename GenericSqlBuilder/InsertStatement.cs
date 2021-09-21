@@ -44,10 +44,10 @@
 
         private void GenerateInsertAttributes()
         {
-            var remove = _sqlBuilderOptions.GetRemovedInsertProperties();
+            var remove = _sqlBuilderOptions.GetRemovedProperties();
             var dataTable = GenericPropertyBuilder<T>.GetPropertiesFromType();
 
-            foreach (var item in _sqlBuilderOptions.GetAddedInsertProperties())
+            foreach (var item in _sqlBuilderOptions.GetAddedProperties())
             {
                 dataTable.Columns.Add(item);
             }
@@ -74,10 +74,10 @@
         
         public void GenerateInsertProperties()
         {
-            var remove = _sqlBuilderOptions.GetRemovedInsertProperties();
+            var remove = _sqlBuilderOptions.GetRemovedProperties();
             var dataTable = GenericPropertyBuilder<T>.GetPropertiesFromType();
 
-            foreach (var item in _sqlBuilderOptions.GetAddedInsertProperties())
+            foreach (var item in _sqlBuilderOptions.GetAddedProperties())
             {
                 dataTable.Columns.Add(item);
             }

@@ -6,60 +6,40 @@ namespace GenericSqlBuilder
     {
         void UsePropertyCase(Casing casing);
         void UseSqlVersion(Version version);
+        void AddProperty(string name);
+        void RemoveProperty(string name);
+        void AddMultipleProperties(List<string> names);
+        void RemoveMultipleProperties(List<string> names);
     }
-
-    public interface IUpdateOptions : IBaseOptions
-    {
-        void AddUpdateProperty(string name);
-        void RemoveUpdateProperty(string name);
-    }
+    
 
     public interface ISelectOptions : IBaseOptions
     {
         void AddAlias(string alias);
-        void RemoveSelectProperty(string name);
-        void AddSelectProperty(string name);
     }
+    
 
-    public interface IInsertOptions : IBaseOptions
-    {
-        void RemoveInsertProperty(string name);
-        void AddInsertProperty(string name);
-    }
-
-    public class SqlBuilderOptions : ISelectOptions, IInsertOptions, IUpdateOptions
+    public class SqlBuilderOptions : ISelectOptions
     {
         public SqlBuilderOptions()
         {
-            _addedInsertProperties = new List<string>();
-            _removedInsertProperties = new List<string>();
-            _removedSelectProperties = new List<string>();
-            _addedSelectProperties = new List<string>();
-            _addedUpdateProperties = new List<string>();
-            _removedUpdateProperties = new List<string>();
+            _removedProperties = new List<string>();
+            _addedProperties = new List<string>();
             _casing = Casing.Default;
             _version = Version.Generic;
             _alias = "";
         }
 
         private Casing _casing;
-        private readonly List<string> _removedSelectProperties;
-        private readonly List<string> _addedSelectProperties;
-        private readonly List<string> _addedInsertProperties;
-        private readonly List<string> _removedInsertProperties;
-        private readonly List<string> _removedUpdateProperties;
-        private readonly List<string> _addedUpdateProperties;
+        private readonly List<string> _removedProperties;
+        private readonly List<string> _addedProperties;
         private Version _version;
         private string _alias;
 
         public void ClearAll()
         {
-            _addedInsertProperties.Clear();
-            _addedSelectProperties.Clear();
-            _removedInsertProperties.Clear();
-            _removedSelectProperties.Clear();
-            _removedUpdateProperties.Clear();
-            _addedUpdateProperties.Clear();
+            _addedProperties.Clear();
+            _removedProperties.Clear();
         }
         
         public void UsePropertyCase(Casing casing)
@@ -77,16 +57,28 @@ namespace GenericSqlBuilder
             _alias = alias;
         }
         
-        public void RemoveSelectProperty(string name)
+        public void RemoveProperty(string name)
         {
-            _removedSelectProperties.Add(name);
+            _removedProperties.Add(name);
+        }
+        
+        public void RemoveMultipleProperties(List<string> names)
+        {
+            _removedProperties.AddRange(names);
         }
 
-        public void AddSelectProperty(string name)
+        public void AddProperty(string name)
         {
-            _addedSelectProperties.Add(name);
+            _addedProperties.Add(name);
         }
+
+        public void AddMultipleProperties(List<string> names)
+        {
+            _addedProperties.AddRange(names);
+        }
+        
         public bool IsAppendStatement { get; set; }
+        
         public string GetAlias()
         {
             return _alias;
@@ -97,59 +89,19 @@ namespace GenericSqlBuilder
             return _casing;
         }
 
-        public List<string> GetRemovedSelectProperties()
+        public List<string> GetRemovedProperties()
         {
-            return _removedSelectProperties;
+            return _removedProperties;
         }
 
-        public List<string> GetAddedSelectProperties()
+        public List<string> GetAddedProperties()
         {
-            return _addedSelectProperties;
+            return _addedProperties;
         }
 
         public Version GetSqlVersion()
         {
             return _version;
-        }
-
-        public void RemoveInsertProperty(string name)
-        {
-            _removedInsertProperties.Add(name);
-        }
-
-        public List<string> GetRemovedInsertProperties()
-        {
-            return _removedInsertProperties;
-        }
-
-        public void AddInsertProperty(string name)
-        {
-            _addedInsertProperties.Add(name);
-        }
-
-        public List<string> GetAddedInsertProperties()
-        {
-            return _addedInsertProperties;
-        }
-
-        public void AddUpdateProperty(string name)
-        {
-            _addedUpdateProperties.Add(name);
-        }
-
-        public List<string> GetAddedUpdateProperties()
-        {
-            return _removedUpdateProperties;
-        }
-
-        public void RemoveUpdateProperty(string name)
-        {
-            _removedUpdateProperties.Add(name);
-        }
-
-        public List<string> GetRemovedUpdateProperties()
-        {
-            return _removedUpdateProperties;
         }
     }
 }

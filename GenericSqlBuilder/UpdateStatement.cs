@@ -77,10 +77,10 @@
 
         private void GenerateUpdateProperties()
         {
-            var remove = _sqlBuilderOptions.GetRemovedUpdateProperties();
+            var remove = _sqlBuilderOptions.GetRemovedProperties();
             var dataTable = GenericPropertyBuilder<T>.GetPropertiesFromType();
 
-            foreach (var item in _sqlBuilderOptions.GetAddedUpdateProperties())
+            foreach (var item in _sqlBuilderOptions.GetAddedProperties())
             {
                 dataTable.Columns.Add(item);
             }

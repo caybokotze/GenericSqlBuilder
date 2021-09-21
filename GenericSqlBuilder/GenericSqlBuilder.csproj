@@ -5,14 +5,19 @@
         <Title>GenericSqlBuilder</Title>
         <Authors>Caybo Kotze</Authors>
         <Company>Merge Digital</Company>
-        <Description>Generic Sql Builder is a tool that you can use to create straight forward generic statements.</Description>
+        <Description>Generic Sql Builder is a tool that you can use to create straight forward generic sql statements.</Description>
         <PackageProjectUrl>https://github.com/caybokotze/genericsqlbuilder</PackageProjectUrl>
         <RepositoryUrl>https://github.com/caybokotze/genericsqlbuilder</RepositoryUrl>
         <RepositoryType>github</RepositoryType>
         <PackageTags>sql builder, generic sql builder</PackageTags>
         <Copyright>A product of Merge Digital</Copyright>
         <PackageLicenseFile>license.txt</PackageLicenseFile>
-        <PackageReleaseNotes>First stable tested public release.</PackageReleaseNotes>
+        <PackageReleaseNotes>Added feature to remove multiple properties simultaneously.</PackageReleaseNotes>
+        <LangVersion>9</LangVersion>
+        <PackageVersion>1.1.0</PackageVersion>
+        <PackageId>GenericSqlBuilder</PackageId>
+        <AssemblyName>GenericSqlBuilder</AssemblyName>
+        <RootNamespace>GenericSqlBuilder</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
