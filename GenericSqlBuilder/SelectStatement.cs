@@ -74,6 +74,7 @@ namespace GenericSqlBuilder
         public SelectStatement AppendSelect<T>(Action<ISelectOptions> options) where T : class, new()
         {
             _appendSelect = true;
+            _sqlBuilderOptions.ClearAll();
             options(_sqlBuilderOptions);
             return AppendSelect<T>();
         }
