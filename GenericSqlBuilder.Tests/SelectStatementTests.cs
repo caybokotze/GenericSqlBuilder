@@ -574,7 +574,7 @@ namespace GenericSqlBuilder.Tests
                                 {
                                     // arrange
                                     var expected =
-                                        "SELECT p.id, p.name, p.email, a.AGE, a.DOESWALK FROM people as p LEFT JOIN animals as a ON p.Id = a.Id;";
+                                        "SELECT p.id, p.name, p.email, a.DOESWALK FROM people as p LEFT JOIN animals as a ON p.Id = a.Id;";
                                     // act
                                     var sql = new SqlBuilder()
                                         .Select<Person>(o =>
@@ -586,6 +586,7 @@ namespace GenericSqlBuilder.Tests
                                         .AppendSelect<Animal>(o =>
                                         {
                                             o.AddAlias("a");
+                                            o.RemoveProperty(nameof(Animal.Age));
                                             o.UsePropertyCase(Casing.UpperCase);
                                         })
                                         .From("people as p")
@@ -594,6 +595,39 @@ namespace GenericSqlBuilder.Tests
                                         .Build();
                                     // assert
                                     Expect(sql).To.Equal(expected);
+                                }
+
+                                [TestFixture]
+                                public class WhenAppendingStatementsWithoutOptions
+                                {
+                                    [Test]
+                                    public void ShouldRemoveCorrelatedPropertiesAndNotThrow()
+                                    {
+                                        // arrange
+                                        var expected =
+                                            "SELECT p.id, p.name, p.email, a.DOESWALK, a.user FROM people as p LEFT JOIN animals as a ON p.Id = a.Id;";
+                                        // act
+                                        var sql = new SqlBuilder()
+                                            .Select<Person>(o =>
+                                            {
+                                                o.AddAlias("p");
+                                                o.UsePropertyCase(Casing.CamelCase);
+                                                o.RemoveProperty(nameof(Person.Surname));
+                                            })
+                                            .AppendSelect<Animal>(o =>
+                                            {
+                                                o.AddAlias("a");
+                                                o.RemoveProperty(nameof(Animal.Age));
+                                                o.UsePropertyCase(Casing.UpperCase);
+                                            })
+                                            .AppendSelect("a.user")
+                                            .From("people as p")
+                                            .LeftJoin("animals as a")
+                                            .On("p.Id = a.Id")
+                                            .Build();
+                                        // assert
+                                        Expect(sql).To.Equal(expected);
+                                    }
                                 }
                             }
                         }

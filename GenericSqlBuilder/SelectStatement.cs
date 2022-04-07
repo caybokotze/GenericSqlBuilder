@@ -61,12 +61,14 @@ namespace GenericSqlBuilder
         public SelectStatement AppendSelect(string sql)
         {
             _appendSelect = true;
+            AddStatement(", " + sql + " ", true);
             return this;
         }
 
         public SelectStatement AppendSelect<T>() where T : class, new()
         {
             _appendSelect = true;
+            _sqlBuilderOptions.ClearAll();
             CreateSelectStatement<T>();
             return this;
         }
