@@ -605,7 +605,7 @@ namespace GenericSqlBuilder.Tests
                                     {
                                         // arrange
                                         var expected =
-                                            "SELECT p.id, p.name, p.email, a.DOESWALK, a.user FROM people as p LEFT JOIN animals as a ON p.Id = a.Id;";
+                                            "SELECT p.id, p.name, p.email, a.DOESWALK, a.user, an.does_walk FROM people as p LEFT JOIN animals as a ON p.Id = a.Id;";
                                         // act
                                         var sql = new SqlBuilder()
                                             .Select<Person>(o =>
@@ -621,6 +621,12 @@ namespace GenericSqlBuilder.Tests
                                                 o.UsePropertyCase(Casing.UpperCase);
                                             })
                                             .AppendSelect("a.user")
+                                            .AppendSelect<Animal>(o =>
+                                            {
+                                                o.AddAlias("an");
+                                                o.RemoveProperty(nameof(Animal.Age));
+                                                o.UsePropertyCase(Casing.SnakeCase);
+                                            })
                                             .From("people as p")
                                             .LeftJoin("animals as a")
                                             .On("p.Id = a.Id")
