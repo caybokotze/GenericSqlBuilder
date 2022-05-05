@@ -216,6 +216,22 @@ namespace GenericSqlBuilder.Tests
                             .Equal("SELECT Id, Name, Surname, Email FROM people WHERE id = 1 AND name LIKE %John%;");
                     }
 
+                    [Test]
+                    public void ShouldAddOrderBy()
+                    {
+                        // arrange
+                        var sql = new SqlBuilder()
+                            .Select<Person>()
+                            .From("people")
+                            .Where("id")
+                            .Equals("1")
+                            .OrderBy("Id")
+                            .Build();
+                        // act
+                        // assert
+                        Expect(sql).To.Equal("SELECT Id, Name, Surname, Email FROM people WHERE id = 1 ORDER BY Id;");
+                    }
+
                     [TestFixture]
                     public class WithRemovedProperties
                     {

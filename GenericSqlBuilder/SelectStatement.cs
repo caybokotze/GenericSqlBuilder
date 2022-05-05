@@ -107,6 +107,12 @@ namespace GenericSqlBuilder
             return this;
         }
 
+        public SelectStatement OrderBy(string clause)
+        {
+            AddStatement($"ORDER BY {clause} ");
+            return this;
+        }
+
         public SelectStatement And()
         {
             AddStatement($"AND ");
