@@ -14,7 +14,7 @@
         <PackageLicenseFile>license.txt</PackageLicenseFile>
         <PackageReleaseNotes>Added feature to remove multiple properties simultaneously.</PackageReleaseNotes>
         <LangVersion>9</LangVersion>
-        <PackageVersion>1.1.4</PackageVersion>
+        <PackageVersion>1.1.5</PackageVersion>
         <PackageId>GenericSqlBuilder</PackageId>
         <AssemblyName>GenericSqlBuilder</AssemblyName>
         <RootNamespace>GenericSqlBuilder</RootNamespace>

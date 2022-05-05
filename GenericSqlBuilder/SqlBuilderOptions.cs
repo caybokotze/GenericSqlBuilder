@@ -8,8 +8,8 @@ namespace GenericSqlBuilder
         void UseSqlVersion(Version version);
         void AddProperty(string name);
         void RemoveProperty(string name);
-        void AddMultipleProperties(List<string> names);
-        void RemoveMultipleProperties(List<string> names);
+        void AddMultipleProperties(IEnumerable<string> names);
+        void RemoveMultipleProperties(IEnumerable<string> names);
     }
     
 
@@ -64,7 +64,7 @@ namespace GenericSqlBuilder
             _removedProperties.Add(name);
         }
         
-        public void RemoveMultipleProperties(List<string> names)
+        public void RemoveMultipleProperties(IEnumerable<string> names)
         {
             _removedProperties.AddRange(names);
         }
@@ -74,7 +74,7 @@ namespace GenericSqlBuilder
             _addedProperties.Add(name);
         }
 
-        public void AddMultipleProperties(List<string> names)
+        public void AddMultipleProperties(IEnumerable<string> names)
         {
             _addedProperties.AddRange(names);
         }
