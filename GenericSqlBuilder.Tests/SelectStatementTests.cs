@@ -337,6 +337,25 @@ namespace GenericSqlBuilder.Tests
                     }
 
                     [TestFixture]
+                    public class WithDistinctAddedAsProperty
+                    {
+                        [Test]
+                        public void ShouldGenerateDistinctSelectStatement()
+                        {
+                            // arrange
+                            var expected = "SELECT DISTINCT Age, DoesWalk FROM animals WHERE id = @Id;";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Select<Animal>(o => o.AppendDistinct())
+                                .From("animals")
+                                .Where("id = @Id")
+                                .Build();
+                            // assert
+                            Expect(sql).To.Equal(expected);
+                        }
+                    }
+
+                    [TestFixture]
                     public class WithAddedProperties
                     {
                         [Test]

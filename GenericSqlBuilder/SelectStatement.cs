@@ -26,7 +26,7 @@ namespace GenericSqlBuilder
             _appendSelect = false;
             _sqlBuilderOptions = sqlBuilderOptions 
                                    ?? new SqlBuilderOptions();
-            
+
             switch (_sqlBuilderOptions.IsAppendStatement)
             {
                 case true:
@@ -34,7 +34,16 @@ namespace GenericSqlBuilder
                     AddStatement("SELECT ");
                     break;
                 case false:
-                    AddStatement("SELECT ");
+                    switch (_sqlBuilderOptions.IsDistinctSelect)
+                    {
+                        case true:
+                            AddStatement("SELECT DISTINCT ");
+                            break;
+                        case false:
+                            AddStatement("SELECT ");
+                            break;
+                    }
+
                     AddStatement(sql);
                     break;
             }

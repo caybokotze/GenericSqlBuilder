@@ -16,6 +16,7 @@ namespace GenericSqlBuilder
     public interface ISelectOptions : IBaseOptions
     {
         void AddAlias(string alias);
+        void AppendDistinct();
     }
     
 
@@ -35,6 +36,7 @@ namespace GenericSqlBuilder
         private readonly List<string> _addedProperties;
         private Version _version;
         private string _alias;
+        private bool _isDistinctSelect = false;
 
         public void ClearAll()
         {
@@ -76,6 +78,13 @@ namespace GenericSqlBuilder
         {
             _addedProperties.AddRange(names);
         }
+
+        public void AppendDistinct()
+        {
+            _isDistinctSelect = true;
+        }
+        
+        public bool IsDistinctSelect => _isDistinctSelect;
         
         public bool IsAppendStatement { get; set; }
         
