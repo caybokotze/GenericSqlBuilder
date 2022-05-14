@@ -205,6 +205,25 @@ namespace GenericSqlBuilder.Tests
                             Expect(sql).To.Equal(expected);
                         }
                     }
+
+                    public class WithIgnoreSetToTrue
+                    {
+                        [Test]
+                        public void ShouldBuildIgnoreInsertInSnakeCase()
+                        {
+                            // arrange
+                            const string expected = @"INSERT IGNORE INTO people (age, does_walk) VALUES (@Age, @DoesWalk);";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Insert<Animal>("people", o => { o.UsePropertyCase(Casing.SnakeCase); }, true)
+                                .Values()
+                                .Build();
+                            // assert
+                            Expect(sql)
+                                .To
+                                .Equal(expected);
+                        }
+                    }
                 }
                 
                 [TestFixture]

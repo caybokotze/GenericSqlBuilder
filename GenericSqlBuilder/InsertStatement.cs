@@ -5,12 +5,21 @@
         private readonly string _sql;
         private readonly SqlBuilderOptions _sqlBuilderOptions;
 
-        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
+        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions, bool addIgnore = false) : base(sqlBuilderOptions)
         {
             _sql = sql;
             _sqlBuilderOptions = sqlBuilderOptions;
 
-            AddStatement("INSERT INTO ");
+            switch (addIgnore)
+            {
+                case false:
+                    AddStatement("INSERT INTO ");
+                    break;
+                case true:
+                    AddStatement("INSERT IGNORE INTO ");
+                    break;
+            }
+            
             AddStatement(sql);
         }
 
@@ -26,12 +35,21 @@
         private readonly string _sql;
         private readonly SqlBuilderOptions _sqlBuilderOptions;
 
-        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
+        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions, bool addIgnore = false) : base(sqlBuilderOptions)
         {
             _sql = sql;
             _sqlBuilderOptions = sqlBuilderOptions;
-            
-            AddStatement("INSERT INTO ");
+
+            switch (addIgnore)
+            {
+                case false:
+                    AddStatement("INSERT INTO ");
+                    break;
+                case true:
+                    AddStatement("INSERT IGNORE INTO ");
+                    break;
+            }
+
             AddStatement(sql);
         }
 
