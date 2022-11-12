@@ -57,24 +57,24 @@ namespace GenericSqlBuilder
             return Select<T>();
         }
 
-        public InsertStatement Insert(string table, string properties, bool addIgnore = false)
+        public InsertStatement Insert(string table, string properties)
         {
             _sql += $"{table} ({properties}) ";
-            return new InsertStatement(_sql, _sqlBuilderOptions, addIgnore);
+            return new InsertStatement(_sql, _sqlBuilderOptions);
         }
 
-        public InsertStatement<T> Insert<T>(string table, bool addIgnore = false) where T : class, new()
+        public InsertStatement<T> Insert<T>(string table) where T : class, new()
         {
             _sql += table + " ";
-            var insertStatement = new InsertStatement<T>(_sql, _sqlBuilderOptions, addIgnore);
+            var insertStatement = new InsertStatement<T>(_sql, _sqlBuilderOptions);
             insertStatement.GenerateInsertProperties();
             return insertStatement;
         }
 
-        public InsertStatement<T> Insert<T>(string table, Action<IBaseOptions> options, bool addIgnore = false) where T : class, new()
+        public InsertStatement<T> Insert<T>(string table, Action<IInsertOptions> options) where T : class, new()
         {
             options(_sqlBuilderOptions);
-            return Insert<T>(table, addIgnore);
+            return Insert<T>(table);
         }
 
         public UpdateStatement Update(string table)

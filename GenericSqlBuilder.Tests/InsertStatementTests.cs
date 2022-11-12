@@ -215,7 +215,34 @@ namespace GenericSqlBuilder.Tests
                             const string expected = @"INSERT IGNORE INTO people (age, does_walk) VALUES (@Age, @DoesWalk);";
                             // act
                             var sql = new SqlBuilder()
-                                .Insert<Animal>("people", o => { o.UsePropertyCase(Casing.SnakeCase); }, true)
+                                .Insert<Animal>("people", o =>
+                                {
+                                    o.UsePropertyCase(Casing.SnakeCase);
+                                    o.AddIgnore();
+                                })
+                                .Values()
+                                .Build();
+                            // assert
+                            Expect(sql)
+                                .To
+                                .Equal(expected);
+                        }
+                    }
+
+                    public class WithOnDuplicateKeyUpdate
+                    {
+                        [Test]
+                        public void ShouldBuildInsertStatementWithOnDuplicateKeyAppended()
+                        {
+                            // arrange
+                            const string expected = @"INSERT INTO people (age, does_walk) VALUES (@Age, @DoesWalk) ON DUPLICATE KEY UPDATE age = @Age, does_walk = @DoesWalk;";
+                            // act
+                            var sql = new SqlBuilder()
+                                .Insert<Animal>("people", o =>
+                                {
+                                    o.UsePropertyCase(Casing.SnakeCase);
+                                    o.AddOnDuplicateKeyUpdate();
+                                })
                                 .Values()
                                 .Build();
                             // assert

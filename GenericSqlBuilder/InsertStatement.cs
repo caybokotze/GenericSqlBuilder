@@ -5,12 +5,12 @@
         private readonly string _sql;
         private readonly SqlBuilderOptions _sqlBuilderOptions;
 
-        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions, bool addIgnore = false) : base(sqlBuilderOptions)
+        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
         {
             _sql = sql;
             _sqlBuilderOptions = sqlBuilderOptions;
 
-            switch (addIgnore)
+            switch (sqlBuilderOptions.GetAddIgnore())
             {
                 case false:
                     AddStatement("INSERT INTO ");
@@ -35,12 +35,12 @@
         private readonly string _sql;
         private readonly SqlBuilderOptions _sqlBuilderOptions;
 
-        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions, bool addIgnore = false) : base(sqlBuilderOptions)
+        public InsertStatement(string sql, SqlBuilderOptions sqlBuilderOptions) : base(sqlBuilderOptions)
         {
             _sql = sql;
             _sqlBuilderOptions = sqlBuilderOptions;
 
-            switch (addIgnore)
+            switch (sqlBuilderOptions.GetAddIgnore())
             {
                 case false:
                     AddStatement("INSERT INTO ");
@@ -56,8 +56,65 @@
         public InsertStatement<T> Values()
         {
             AddStatement("VALUES ");
-            GenerateInsertAttributes();
+            if (_sqlBuilderOptions.GetOnDuplicateKeyUpdate())
+            {
+                GenerateInsertAttributes();
+                AddStatement("ON DUPLICATE KEY UPDATE ");
+                GenerateInsertOnDuplicateKeyAttributes();
+            }
+
+            if (!_sqlBuilderOptions.GetOnDuplicateKeyUpdate())
+            {
+                GenerateInsertAttributes();
+            }
+            
             return this;
+        }
+
+        private void GenerateInsertOnDuplicateKeyAttributes()
+        {
+            var remove = _sqlBuilderOptions.GetRemovedProperties();
+            var dataTable = GenericPropertyBuilder<T>.GetPropertiesFromType();
+
+            foreach (var item in _sqlBuilderOptions.GetAddedProperties())
+            {
+                dataTable.Columns.Add(item);
+            }
+            
+            if (remove != null && remove.Count > 0)
+            {
+                foreach (var item in remove)
+                {
+                    dataTable.Columns.Remove(item);
+                }
+            }
+
+            var variableArray = new string[dataTable.Columns.Count];
+
+            for (var i = 0; i < dataTable.Columns.Count; i ++)
+            {
+                variableArray[i] = dataTable.Columns[i].ColumnName
+                    .ConvertCase(_sqlBuilderOptions.GetCase());
+                var attribute = dataTable.Columns[i].ColumnName;
+                var property = "";
+                
+                switch (_sqlBuilderOptions.GetSqlVersion())
+                {
+                    case Version.MsSql:
+                        property = $"[{variableArray[i]}]";
+                        break;
+                    case Version.MySql:
+                        property = $"`{variableArray[i]}`";
+                        break;
+                    case Version.Generic:
+                        property = variableArray[i];
+                        break;
+                }
+
+                variableArray[i] = $"{property} = @{attribute}";
+            }
+            
+            AddStatement($"{string.Join(", ", variableArray)}" + " ");
         }
 
         private void GenerateInsertAttributes()

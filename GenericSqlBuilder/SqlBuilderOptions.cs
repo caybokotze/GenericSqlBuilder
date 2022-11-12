@@ -18,9 +18,15 @@ namespace GenericSqlBuilder
         void AddAlias(string alias);
         void AppendDistinct();
     }
+
+    public interface IInsertOptions : IBaseOptions
+    {
+        void AddIgnore();
+        void AddOnDuplicateKeyUpdate();
+    }
     
 
-    public class SqlBuilderOptions : ISelectOptions
+    public class SqlBuilderOptions : ISelectOptions, IInsertOptions
     {
         public SqlBuilderOptions()
         {
@@ -36,7 +42,9 @@ namespace GenericSqlBuilder
         private readonly List<string> _addedProperties;
         private Version _version;
         private string _alias;
-        private bool _isDistinctSelect = false;
+        private bool _isDistinctSelect;
+        private bool _addIgnore;
+        private bool _addOnDuplicateKeyUpdate;
 
         public void ClearAll()
         {
@@ -52,6 +60,26 @@ namespace GenericSqlBuilder
         public void UseSqlVersion(Version version)
         {
             _version = version;
+        }
+
+        public void AddIgnore()
+        {
+            _addIgnore = true;
+        }
+
+        public void AddOnDuplicateKeyUpdate()
+        {
+            _addOnDuplicateKeyUpdate = true;
+        }
+
+        public bool GetOnDuplicateKeyUpdate()
+        {
+            return _addOnDuplicateKeyUpdate;
+        }
+
+        public bool GetAddIgnore()
+        {
+            return _addIgnore;
         }
 
         public void AddAlias(string alias)
